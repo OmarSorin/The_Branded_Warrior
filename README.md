@@ -2,7 +2,6 @@
 
 Un joc 2D, rogue-like despre aventura si lupta. Va fi un joc turn-based in care scopul este sa explorezi o harta si sa gasesti calea de iesire. Pe parcurs vei intalni monstrii, care vor putea fi evitati prin traversarea hartii grid-like sau vor putea fi infruntati. Vor exista diferite tipuri de monstrii, desigur, cu statistici si pattern-uri de atac diferite. Player-ul va dispune si de potiuni de heal( ulterior si de alte efecte, hopefully) care vor fi consumate intr-un turn. Doresc sa implementez si diferite clase/arme/armura, dar voi vedea pe parcurs.
 
-### Folosiți template-ul corespunzător grupei voastre!
 
 
 
