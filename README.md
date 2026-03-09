@@ -1,30 +1,10 @@
-# Nu primesc notă pentru că nu am pus titlu și descriere
+# The Branded Warrior
+
+Un joc 2D, rogue-like despre aventura si lupta. Va fi un joc turn-based in care scopul este sa explorezi o harta si sa gasesti calea de iesire. Pe parcurs vei intalni monstrii, care vor putea fi evitati prin traversarea hartii grid-like sau vor putea fi infruntati. Vor exista diferite tipuri de monstrii, desigur, cu statistici si pattern-uri de atac diferite. Player-ul va dispune si de potiuni de heal( ulterior si de alte efecte, hopefully) care vor fi consumate intr-un turn. Doresc sa implementez si diferite clase/arme/armura, dar voi vedea pe parcurs.
 
 ### Folosiți template-ul corespunzător grupei voastre!
 
-| Laborant  | Link template                                |
-|-----------|----------------------------------------------|
-| Dragoș B  | https://github.com/Ionnier/oop-template      |
-| Tiberiu M | https://github.com/MaximTiberiu/oop-template |
-| Marius MC | https://github.com/mcmarius/oop-template     |
 
-### Important!
-
-Aveți voie cu cod generat de modele de limbaj la care nu ați contribuit semnificativ doar dacă documentați riguros acest proces.
-Codul generat pus "ca să fie"/pe care nu îl înțelegeți se punctează doar pentru puncte bonus, doar în contextul
-în care oferă funcționalități ajutătoare și doar dacă are sens.
-
-Codul din proiect trebuie să poată fi ușor de înțeles și de modificat de către altcineva. Pentru detalii, veniți la ore.
-
-O cerință nu se consideră îndeplinită dacă este realizată doar prin cod generat.
-
-- **Fără cod de umplutură/fără sens!**
-- **Fără copy-paste!**
-- **Fără variabile globale!**
-- **Fără atribute publice!**
-- **Pentru T2 și T3, fără date în cod!** Datele vor fi citite din fișier, aveți exemple destule.
-- **Obligatoriu** fișiere cu date mai multe din care să citiți, obligatoriu cu biblioteci externe: fișiere (local sau server) sau baze de date
-- obligatoriu (TBD) să integrați cel puțin două biblioteci externe pe lângă cele pentru stocare
 
 ### Tema 0
 
