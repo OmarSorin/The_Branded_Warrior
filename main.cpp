@@ -81,6 +81,16 @@ private:
     int healAmount;
     int price;
 
+    int rollOverheal() const {
+      static std::mt19937 rng{std::random_device{}()};
+      std::uniform_int_distribution<int> coinFlip(0, 1);
+      if (coinFlip(rng) == 1) {
+        std::uniform_int_distribution<int> bonusDist(3, 5);
+        return bonusDist(rng);
+      }
+      return 0;
+    }
+
 public:
     // Constructor cu parametri
     Potion(const std::string& name = "Unknown Potion", int healAmount = 10, int price = 5)
@@ -105,11 +115,12 @@ public:
 
     // Funcție: calculează vindecarea efectivă (ține cont de HP maxim)
     int consume(int currentHp, int maxHp) const {
-        int effectiveHeal = healAmount;
+      int effectiveHeal = healAmount;
         if (currentHp + effectiveHeal > maxHp) {
-            effectiveHeal = maxHp - currentHp;
+          effectiveHeal = maxHp - currentHp;
         }
-        return effectiveHeal;
+      effectiveHeal += rollOverheal();
+      return effectiveHeal;
     }
 
 };
@@ -370,10 +381,10 @@ public:
     if (!isAlive()) {
       return 0;
     }
-    if (hp >= maxHp) {
+    int healed = potion.consume(hp, maxHp);
+    if (healed <= 0) {
       return 0;
     }
-    int healed = potion.consume(hp, maxHp);
     hp += healed;
     return healed;
   }
