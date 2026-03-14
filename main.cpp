@@ -1,134 +1,127 @@
-#include <iostream>
+#include <algorithm>
 #include <array>
 #include <chrono>
+#include <iostream>
 #include <random>
-#include <thread>
 #include <string>
-#include <algorithm>
+#include <thread>
+
 
 #include <SFML/Graphics.hpp>
 
 #include "include/Example.h"
 
-
 class Weapon {
 private:
-    std::string name;
-    int damage;
-    int durability;
-    int maxDurability;
+  std::string name;
+  int damage;
+  int durability;
+  int maxDurability;
 
-    // Funcție privată: calculează dacă atacul este critic (20% șansă, x2 damage)
-    int rollCritical() const {
-        static std::mt19937 rng{std::random_device{}()};
-        std::uniform_int_distribution<int> dist(1, 5);
-        if (dist(rng) == 1) {
-            return damage * 2;
-        }
-        return damage;
+  // Functie privata: calculeaza daca atacul este critic (20% sansa, x2 damage)
+  int rollCritical() const {
+    static std::mt19937 rng{std::random_device{}()};
+    std::uniform_int_distribution<int> dist(1, 5);
+    if (dist(rng) == 1) {
+      return damage * 2;
     }
+    return damage;
+  }
 
 public:
-    // Constructor cu parametri
-    Weapon(const std::string& name = "Fists", int damage = 2, int durability = 100)
-        : name(name), damage(damage), durability(durability), maxDurability(durability) {}
+  // Constructor cu parametri
+  Weapon(const std::string &name = "Fists", int damage = 2,
+         int durability = 100)
+      : name(name), damage(damage), durability(durability),
+        maxDurability(durability) {}
 
-    // Getters (const)
-    const std::string& getName() const { return name; }
-    int getDamage() const { return damage; }
-    int getDurability() const { return durability; }
-    int getMaxDurability() const { return maxDurability; }
+  // Getters (const)
+  const std::string &getName() const { return name; }
+  int getDamage() const { return damage; }
+  int getDurability() const { return durability; }
+  int getMaxDurability() const { return maxDurability; }
 
-    bool isBroken() const {
-        return durability <= 0;
+  bool isBroken() const { return durability <= 0; }
+
+  // Functie non-triviala: ataca si reduce durabilitatea
+  int attack() {
+    if (isBroken()) {
+      return 0;
     }
-
-    // Funcție non-trivială: atacă și reduce durabilitatea
-    int attack() {
-        if (isBroken()) {
-            return 0;
-        }
-        int dealt = rollCritical();
-        --durability;
-        if (durability < 0) { durability = 0; }
-        return dealt;
+    int dealt = rollCritical();
+    --durability;
+    if (durability < 0) {
+      durability = 0;
     }
-
-    // Funcție: repară arma (nu depășește maxDurability)
-    void repair(int amount) {
-        durability += amount;
-        if (durability > maxDurability) {
-            durability = maxDurability;
-        }
-    }
-
-    // operator<< pentru afișare
-
-};
-  std::ostream &operator<<(std::ostream &os, const Weapon &w) {
-    os << "Weapon[" << w.getName() << ", dmg=" << w.getDamage()
-       << ", dur=" << w.getDurability() << "/" << w.getMaxDurability();
-    if (w.isBroken()) {
-      os << " (BROKEN)";
-    }
-    os << "]";
-    return os;
+    return dealt;
   }
+
+  // Functie: repara arma (nu depaseste maxDurability)
+  void repair(int amount) {
+    durability += amount;
+    if (durability > maxDurability) {
+      durability = maxDurability;
+    }
+  }
+
+  // operator<< pentru afisare
+};
+std::ostream &operator<<(std::ostream &os, const Weapon &w) {
+  os << "Weapon[" << w.getName() << ", dmg=" << w.getDamage()
+     << ", dur=" << w.getDurability() << "/" << w.getMaxDurability();
+  if (w.isBroken()) {
+    os << " (BROKEN)";
+  }
+  os << "]";
+  return os;
+}
 
 class Potion {
 private:
-    std::string name;
-    int healAmount;
-    int price;
-
-    int rollOverheal() const {
-      static std::mt19937 rng{std::random_device{}()};
-      std::uniform_int_distribution<int> coinFlip(0, 1);
-      if (coinFlip(rng) == 1) {
-        std::uniform_int_distribution<int> bonusDist(3, 5);
-        return bonusDist(rng);
-      }
-      return 0;
-    }
+  std::string name;
+  int healAmount;
+  int price;
 
 public:
-    // Constructor cu parametri
-    Potion(const std::string& name = "Unknown Potion", int healAmount = 10, int price = 5)
-        : name(name), healAmount(healAmount), price(price) {}
+  // Constructor cu parametri
+  Potion(const std::string &name = "Unknown Potion", int healAmount = 10,
+         int price = 5)
+      : name(name), healAmount(healAmount), price(price) {}
 
-    // Getters (const)
-    const std::string& getName() const { return name; }
-    int getHealAmount() const { return healAmount; }
-    int getPrice() const { return price; }
+  // Getters (const)
+  const std::string &getName() const { return name; }
+  int getHealAmount() const { return healAmount; }
+  int getPrice() const { return price; }
 
-    // Funcție non-trivială: compară eficiența poțiunilor (vindecamant per unitate de preț)
-    bool isStrongerThan(const Potion& other) const {
-        if (price == 0 && other.price == 0) {
-            return healAmount > other.healAmount;
-        }
-        if (other.price == 0) return false;
-        if (price == 0) return true;
-        double thisRatio = static_cast<double>(healAmount) / price;
-        double otherRatio = static_cast<double>(other.healAmount) / other.price;
-        return thisRatio > otherRatio;
+  // Functie non-triviala: compara eficienta potiunilor (vindecamant per unitate
+  // de pret)
+  bool isStrongerThan(const Potion &other) const {
+    if (price == 0 && other.price == 0) {
+      return healAmount > other.healAmount;
     }
-
-    // Funcție: calculează vindecarea efectivă (ține cont de HP maxim)
-    int consume(int currentHp, int maxHp) const {
-      int effectiveHeal = healAmount;
-        if (currentHp + effectiveHeal > maxHp) {
-          effectiveHeal = maxHp - currentHp;
-        }
-      effectiveHeal += rollOverheal();
-      return effectiveHeal;
-    }
-
-};
-  std::ostream &operator<<(std::ostream &os, const Potion &p) {
-    os << "Potion[" << p.getName() << ", heal=" << p.getHealAmount()
-      << ", price=" << p.getPrice() << "]";
-    return os;
+    if (other.price == 0)
+      return false;
+    if (price == 0)
+      return true;
+    double thisRatio = static_cast<double>(healAmount) / price;
+    double otherRatio = static_cast<double>(other.healAmount) / other.price;
+    return thisRatio > otherRatio;
   }
+
+  // Functie: calculeaza vindecarea efectiva (tine cont de HP maxim)
+  int consume(int currentHp, int maxHp) const {
+    int effectiveHeal = healAmount;
+    if (currentHp + effectiveHeal > maxHp) {
+      effectiveHeal = maxHp - currentHp;
+    }
+    return effectiveHeal;
+  }
+};
+std::ostream &operator<<(std::ostream &os, const Potion &p) {
+  os << "Potion[" << p.getName() << ", heal=" << p.getHealAmount()
+     << ", price=" << p.getPrice() << "]";
+  return os;
+}
 
 class Inventory {
 private:
@@ -136,7 +129,7 @@ private:
   int size;
   int capacity;
 
-  // Funcție privată: redimensionează array-ul intern
+  // Functie privata: redimensioneaza array-ul intern
   void resize(int newCapacity) {
     Weapon *newWeapons = new Weapon[newCapacity];
     for (int i = 0; i < size; ++i) {
@@ -179,14 +172,14 @@ public:
     std::swap(capacity, other.capacity);
   }
 
-  // --- Funcții publice ---
+  // --- Functii publice ---
 
   int getSize() const { return size; }
   int getCapacity() const { return capacity; }
   bool isEmpty() const { return size == 0; }
   bool isFull() const { return size >= capacity; }
 
-  // Adaugă o armă în inventar (redimensionare automată)
+  // Adauga o arma in inventar (redimensionare automata)
   bool addWeapon(const Weapon &w) {
     if (size >= capacity) {
       resize(capacity * 2);
@@ -196,7 +189,7 @@ public:
     return true;
   }
 
-  // Elimină o armă din inventar (prin index)
+  // Elimina o arma din inventar (prin index)
   bool removeWeapon(int index) {
     if (index < 0 || index >= size) {
       return false;
@@ -208,14 +201,14 @@ public:
     return true;
   }
 
-  // Acces la o armă (const)
+  // Acces la o arma (const)
   const Weapon &getWeapon(int index) const { return weapons[index]; }
 
-  // Acces la o armă (non-const, necesar pentru attack care modifică durability)
+  // Acces la o arma (non-const, necesar pentru attack care modifica durability)
   Weapon &getWeapon(int index) { return weapons[index]; }
 
-  // Funcție non-trivială: găsește indexul armei cea mai puternică (care nu e
-  // stricată)
+  // Functie non-triviala: gaseste indexul armei cea mai puternica (care nu e
+  // stricata)
   int findStrongestIndex() const {
     int bestIndex = -1;
     int bestDamage = -1;
@@ -228,7 +221,7 @@ public:
     return bestIndex;
   }
 
-  // Funcție non-trivială: calculează damage-ul total al armelor funcționale
+  // Functie non-triviala: calculeaza damage-ul total al armelor functionale
   int totalDamage() const {
     int total = 0;
     for (int i = 0; i < size; ++i) {
@@ -239,7 +232,7 @@ public:
     return total;
   }
 
-  // Funcție non-trivială: elimină toate armele stricate din inventar
+  // Functie non-triviala: elimina toate armele stricate din inventar
   int removeAllBroken() {
     int removed = 0;
     int writeIdx = 0;
@@ -256,21 +249,20 @@ public:
     size = writeIdx;
     return removed;
   }
-
 };
-  std::ostream &operator<<(std::ostream &os, const Inventory &inv) {
-    os << "Inventory[" << inv.getSize() << "/" << inv.getCapacity() << "]";
-    if (inv.getSize() > 0) {
-      os << " {";
-      for (int i = 0; i < inv.getSize(); ++i) {
-        os << "\n    " << (i + 1) << ". " << inv.getWeapon(i);
-      }
-      os << "\n  }";
-    } else {
-      os << " {empty}";
+std::ostream &operator<<(std::ostream &os, const Inventory &inv) {
+  os << "Inventory[" << inv.getSize() << "/" << inv.getCapacity() << "]";
+  if (inv.getSize() > 0) {
+    os << " {";
+    for (int i = 0; i < inv.getSize(); ++i) {
+      os << "\n    " << (i + 1) << ". " << inv.getWeapon(i);
     }
-    return os;
+    os << "\n  }";
+  } else {
+    os << " {empty}";
   }
+  return os;
+}
 
 class Character {
 private:
@@ -283,11 +275,11 @@ private:
   int posX;
   int posY;
 
-  // Funcție privată: calculează XP-ul necesar pentru următorul nivel
+  // Functie privata: calculeaza XP-ul necesar pentru urmatorul nivel
   int xpForNextLevel() const { return level * 50 + 50; }
 
-  // Funcție privată: verifică și aplică level up, returnează nr. de niveluri
-  // câștigate
+  // Functie privata: verifica si aplica level up, returneaza nr. de niveluri
+  // castigate
   int checkLevelUp() {
     int levelsGained = 0;
     while (xp >= xpForNextLevel()) {
@@ -303,13 +295,13 @@ private:
 
 public:
   // Constructor cu parametri
-  // Arma primită este adăugată ca slot 0 în inventar (= arma echipată)
+  // Arma primita este adaugata ca slot 0 in inventar (= arma echipata)
   Character(const std::string &name = "Hero", int hp = 100, int level = 1,
             const Weapon &weapon = Weapon(), const Inventory &inv = Inventory(),
             int posX = 0, int posY = 0)
       : name(name), hp(hp), maxHp(hp), level(level), xp(0), inventory(inv),
         posX(posX), posY(posY) {
-    // Arma inițială merge pe prima poziție în inventar
+    // Arma initiala merge pe prima pozitie in inventar
     inventory.addWeapon(weapon);
   }
 
@@ -322,12 +314,12 @@ public:
   int getXpForNextLevel() const { return xpForNextLevel(); }
   bool isAlive() const { return hp > 0; }
 
-  // Arma echipată = prima armă din inventar (slot 0)
+  // Arma echipata = prima arma din inventar (slot 0)
   const Weapon &getEquippedWeapon() const { return inventory.getWeapon(0); }
 
   const Inventory &getInventory() const { return inventory; }
 
-  // Getteri și setteri pentru coordonate
+  // Getteri si setteri pentru coordonate
   int getX() const { return posX; }
   int getY() const { return posY; }
   void setPosition(int x, int y) {
@@ -339,18 +331,18 @@ public:
     posY += dy;
   }
 
-  // Adaugă armă în inventar
+  // Adauga arma in inventar
   void pickUpWeapon(const Weapon &w) { inventory.addWeapon(w); }
 
-  // --- Funcții non-triviale ---
+  // --- Functii non-triviale ---
 
-  // Atacă un alt personaj. Returnează damage-ul dat (0 dacă atacul a eșuat).
+  // Ataca un alt personaj. Returneaza damage-ul dat (0 daca atacul a esuat).
   int attackTarget(Character &target) {
     if (!isAlive()) {
       return 0;
     }
 
-    // Atacă cu arma echipată (slot 0)
+    // Ataca cu arma echipata (slot 0)
     int dealt = inventory.getWeapon(0).attack();
     if (dealt == 0) {
       return 0;
@@ -366,7 +358,7 @@ public:
     return dealt;
   }
 
-  // Primește damage, returnează true dacă personajul a murit
+  // Primeste damage, returneaza true daca personajul a murit
   bool takeDamage(int amount) {
     hp -= amount;
     if (hp < 0) {
@@ -375,37 +367,35 @@ public:
     return hp == 0;
   }
 
-  // Folosește o poțiune, returnează câte HP s-au vindecat (0 dacă nu s-a
+  // Foloseste o potiune, returneaza cate HP s-au vindecat (0 daca nu s-a
   // vindecat)
   int heal(const Potion &potion) {
     if (!isAlive()) {
       return 0;
     }
-    int healed = potion.consume(hp, maxHp);
-    if (healed <= 0) {
+    if (hp >= maxHp) {
       return 0;
     }
+    int healed = potion.consume(hp, maxHp);
     hp += healed;
     return healed;
   }
 
-  // Câștigă XP și verifică level up, returnează nr. de niveluri câștigate
+  // Castiga XP si verifica level up, returneaza nr. de niveluri castigate
   int gainXp(int amount) {
     xp += amount;
     return checkLevelUp();
   }
-
 };
-  std::ostream &operator<<(std::ostream &os, const Character &c) {
-    os << "=== " << c.getName() << " ===\n"
-       << "  Level: " << c.getLevel() << " (XP: " << c.getXp() << "/"
-       << c.getXpForNextLevel() << ")\n"
-       << "  HP: " << c.getHp() << "/" << c.getMaxHp() << "\n"
-       << "  Pos: (" << c.getX() << ", " << c.getY() << ")\n"
-       << "  " << c.getInventory();
-    return os;
-  }
-
+std::ostream &operator<<(std::ostream &os, const Character &c) {
+  os << "=== " << c.getName() << " ===\n"
+     << "  Level: " << c.getLevel() << " (XP: " << c.getXp() << "/"
+     << c.getXpForNextLevel() << ")\n"
+     << "  HP: " << c.getHp() << "/" << c.getMaxHp() << "\n"
+     << "  Pos: (" << c.getX() << ", " << c.getY() << ")\n"
+     << "  " << c.getInventory();
+  return os;
+}
 
 int main() {
 
@@ -639,10 +629,50 @@ int main() {
   Character customPlayer(playerName, playerHp, 1, customWeapon);
   std::cout << "\nPersonajul tau:\n" << customPlayer << "\n";
 
+  // --- 11. Simulare Miscare ---
+  std::cout << "\n========================================\n";
+  std::cout << "   SIMULARE MISCARE\n";
+  std::cout << "========================================\n\n";
+
+  std::cout << hero.getName() << " porneste de la pozitia ("
+            << hero.getX() << ", " << hero.getY() << ")\n\n";
+
+  // Simuleaza o patrulare: dreapta, sus, stanga, jos
+  std::array<std::pair<int, int>, 8> moves = {{
+      {1, 0}, {1, 0}, {1, 0},   // 3 pasi la dreapta
+      {0, -1}, {0, -1},          // 2 pasi in sus
+      {-1, 0}, {-1, 0},          // 2 pasi la stanga
+      {0, 1}                     // 1 pas in jos
+  }};
+
+  for (size_t i = 0; i < moves.size(); ++i) {
+      int dx = moves[i].first;
+      int dy = moves[i].second;
+
+      std::string direction;
+      if (dx > 0) direction = "dreapta";
+      else if (dx < 0) direction = "stanga";
+      else if (dy > 0) direction = "jos";
+      else direction = "sus";
+
+      hero.move(dx, dy);
+      std::cout << "  Pasul " << (i + 1) << ": se misca " << direction
+                << " -> (" << hero.getX() << ", " << hero.getY() << ")\n";
+  }
+
+  std::cout << "\n" << hero.getName() << " a ajuns la ("
+            << hero.getX() << ", " << hero.getY() << ")\n";
+
+  // Teleportare la o pozitie specifica
+  hero.setPosition(10, 5);
+  std::cout << hero.getName() << " se teleporteaza la ("
+            << hero.getX() << ", " << hero.getY() << ")\n";
+
+  std::cout << "\n" << hero << "\n";
+
   std::cout << "\n========================================\n";
   std::cout << "   Sfarsit Scenariu\n";
   std::cout << "========================================\n";
 
   return 0;
 }
-
