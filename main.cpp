@@ -82,6 +82,17 @@ private:
   int healAmount;
   int price;
 
+  // 50% sansa de lucky heal: +3-5 HP bonus
+  int rollLuckyHeal() const {
+    static std::mt19937 rng{std::random_device{}()};
+    std::uniform_int_distribution<int> coinFlip(0, 1);
+    if (coinFlip(rng) == 1) {
+      std::uniform_int_distribution<int> bonusDist(3, 5);
+      return bonusDist(rng);
+    }
+    return 0;
+  }
+
 public:
   // Constructor cu parametri
   Potion(const std::string &name = "Unknown Potion", int healAmount = 10,
@@ -108,13 +119,14 @@ public:
     return thisRatio > otherRatio;
   }
 
-  // Functie: calculeaza vindecarea efectiva (tine cont de HP maxim)
+  // Overheal: potiunea vindeca complet (poate depasi maxHp), dar nu poti folosi
+  //           potiuni daca esti deja la sau peste maxHp
+  // Lucky heal: 50% sansa de +3-5 HP bonus
   int consume(int currentHp, int maxHp) const {
-    int effectiveHeal = healAmount;
-    if (currentHp + effectiveHeal > maxHp) {
-      effectiveHeal = maxHp - currentHp;
+    if (currentHp >= maxHp) {
+      return 0;
     }
-    return effectiveHeal;
+    return healAmount + rollLuckyHeal();
   }
 };
 std::ostream &operator<<(std::ostream &os, const Potion &p) {
@@ -397,169 +409,176 @@ std::ostream &operator<<(std::ostream &os, const Character &c) {
   return os;
 }
 
-int main() {
+class GameDemo {
+private:
+  Weapon sword{"Iron Sword", 15, 10};
+  Weapon axe{"Battle Axe", 20, 8};
+  Weapon dagger{"Shadow Dagger", 12, 15};
+  Weapon hammer{"War Hammer", 25, 5};
 
-  std::cout << "========================================\n";
-  std::cout << "   ROGUELIKE RPG - Scenariu de Joc\n";
-  std::cout << "========================================\n\n";
+  Potion smallPotion{"Small Heal", 20, 10};
+  Potion bigPotion{"Greater Heal", 50, 30};
+  Potion freePotion{"Free Sample", 5, 0};
 
-  // --- 1. Creăm arme ---
-  std::cout << "--- Creare Arme ---\n";
-  Weapon sword("Iron Sword", 15, 10);
-  Weapon axe("Battle Axe", 20, 8);
-  Weapon dagger("Shadow Dagger", 12, 15);
-  Weapon hammer("War Hammer", 25, 5);
+  Character hero{"Aldric", 120, 1, sword};
+  Character enemy{"Goblin", 40, 1, dagger};
 
-  std::cout << sword << "\n";
-  std::cout << axe << "\n";
-  std::cout << dagger << "\n";
-  std::cout << hammer << "\n\n";
+  // --- Sectiuni private ale demo-ului ---
 
-  // --- 2. Creăm poțiuni ---
-  std::cout << "--- Creare Potiuni ---\n";
-  Potion smallPotion("Small Heal", 20, 10);
-  Potion bigPotion("Greater Heal", 50, 30);
-  Potion freePotion("Free Sample", 5, 0);
-
-  std::cout << smallPotion << "\n";
-  std::cout << bigPotion << "\n";
-  std::cout << freePotion << "\n";
-
-  // Comparăm poțiuni (isStrongerThan)
-  std::cout << "\n"
-            << smallPotion.getName() << " vs " << bigPotion.getName() << ": ";
-  if (smallPotion.isStrongerThan(bigPotion)) {
-    std::cout << smallPotion.getName() << " are un raport heal/pret mai bun.\n";
-  } else {
-    std::cout << bigPotion.getName() << " are un raport heal/pret mai bun.\n";
-  }
-  std::cout << "\n";
-
-  // --- 3. Creăm inventar și demonstrăm funcționalități ---
-  std::cout << "--- Creare Inventar ---\n";
-  Inventory inv(3);
-  inv.addWeapon(sword);
-  inv.addWeapon(dagger);
-  inv.addWeapon(axe);
-  std::cout << inv << "\n\n";
-
-  // findStrongestIndex
-  int bestIdx = inv.findStrongestIndex();
-  if (bestIdx != -1) {
-    std::cout << "Cea mai puternica arma: " << inv.getWeapon(bestIdx) << "\n";
+  void demoWeapons() {
+    std::cout << "--- Creare Arme ---\n";
+    std::cout << sword << "\n";
+    std::cout << axe << "\n";
+    std::cout << dagger << "\n";
+    std::cout << hammer << "\n\n";
   }
 
-  // totalDamage
-  std::cout << "Damage total in inventar: " << inv.totalDamage() << "\n\n";
+  void demoPotions() {
+    std::cout << "--- Creare Potiuni ---\n";
+    std::cout << smallPotion << "\n";
+    std::cout << bigPotion << "\n";
+    std::cout << freePotion << "\n";
 
-  // --- 4. Demonstrăm Rule of Three ---
-  std::cout << "--- Rule of Three: Copy Constructor ---\n";
-  Inventory invCopy(inv);
-  std::cout << "Original: " << inv << "\n";
-  std::cout << "Copie:    " << invCopy << "\n";
-
-  // Modificăm copia si verificăm că originalul NU se schimbă (deep copy)
-  invCopy.removeWeapon(0);
-  std::cout << "\nDupa stergerea primei arme din copie:\n";
-  std::cout << "Original: " << inv << "\n";
-  std::cout << "Copie:    " << invCopy << "\n\n";
-
-  std::cout << "--- Rule of Three: Operator= ---\n";
-  Inventory invAssigned;
-  invAssigned = inv;
-  std::cout << "Atribuit: " << invAssigned << "\n\n";
-
-  // --- 5. Creăm personaje ---
-  // Arma echipată = prima armă din inventar (slot 0)
-  std::cout << "--- Creare Personaje ---\n";
-  Character hero("Aldric", 120, 1, sword);
-  Character enemy("Goblin", 40, 1, dagger);
-
-  hero.pickUpWeapon(axe);
-  hero.pickUpWeapon(hammer);
-
-  std::cout << hero << "\n\n";
-  std::cout << enemy << "\n\n";
-
-  // --- 6. Scenariu de luptă ---
-  std::cout << "========================================\n";
-  std::cout << "   LUPTA: " << hero.getName() << " vs " << enemy.getName()
-            << "\n";
-  std::cout << "========================================\n\n";
-
-  int round = 1;
-  while (hero.isAlive() && enemy.isAlive()) {
-    std::cout << "--- Runda " << round << " ---\n";
-
-    // Salvăm starea înainte de atac
-    bool heroWeaponBroken = hero.getEquippedWeapon().isBroken();
-    int heroBaseDmg = hero.getEquippedWeapon().getDamage();
-
-    int heroDmg = hero.attackTarget(enemy);
-
-    if (!hero.isAlive()) {
-      std::cout << "  " << hero.getName()
-                << " nu mai este in viata si nu poate ataca!\n";
-    } else if (heroDmg == 0 && heroWeaponBroken) {
-      std::cout << "  " << hero.getName() << " incearca sa atace, dar arma ("
-                << hero.getEquippedWeapon().getName() << ") este stricata!\n";
-    } else if (heroDmg > 0) {
-      if (heroDmg > heroBaseDmg) {
-        std::cout << "  ** CRITICAL HIT! **\n";
-      }
-      std::cout << "  " << hero.getName() << " ataca pe " << enemy.getName()
-                << " cu " << hero.getEquippedWeapon().getName() << " pentru "
-                << heroDmg << " damage!\n";
-      if (!enemy.isAlive()) {
-        int xpGained = 1 * 30 + 20; // enemy level * 30 + 20
-        std::cout << "  " << enemy.getName() << " a cazut in lupta! (HP: 0)\n";
-        std::cout << "  " << enemy.getName() << " a fost invins! "
-                  << hero.getName() << " castiga " << xpGained << " XP!\n";
-      } else {
-        std::cout << "  " << enemy.getName() << " are acum " << enemy.getHp()
-                  << "/" << enemy.getMaxHp() << " HP.\n";
-      }
+    std::cout << "\n"
+              << smallPotion.getName() << " vs " << bigPotion.getName() << ": ";
+    if (smallPotion.isStrongerThan(bigPotion)) {
+      std::cout << smallPotion.getName()
+                << " are un raport heal/pret mai bun.\n";
+    } else {
+      std::cout << bigPotion.getName()
+                << " are un raport heal/pret mai bun.\n";
     }
+    std::cout << "\n";
+  }
 
-    // Inamicul atacă (dacă e în viață)
-    if (enemy.isAlive()) {
-      bool enemyWeaponBroken = enemy.getEquippedWeapon().isBroken();
-      int enemyBaseDmg = enemy.getEquippedWeapon().getDamage();
+  void demoInventory() {
+    std::cout << "--- Creare Inventar ---\n";
+    Inventory inv(3);
+    inv.addWeapon(sword);
+    inv.addWeapon(dagger);
+    inv.addWeapon(axe);
+    std::cout << inv << "\n\n";
 
-      int enemyDmg = enemy.attackTarget(hero);
+    int bestIdx = inv.findStrongestIndex();
+    if (bestIdx != -1) {
+      std::cout << "Cea mai puternica arma: " << inv.getWeapon(bestIdx) << "\n";
+    }
+    std::cout << "Damage total in inventar: " << inv.totalDamage() << "\n\n";
+  }
 
-      if (!enemy.isAlive()) {
-        std::cout << "  " << enemy.getName()
+  void demoRuleOfThree() {
+    std::cout << "--- Rule of Three: Copy Constructor ---\n";
+    Inventory inv(3);
+    inv.addWeapon(sword);
+    inv.addWeapon(dagger);
+    inv.addWeapon(axe);
+
+    Inventory invCopy(inv);
+    std::cout << "Original: " << inv << "\n";
+    std::cout << "Copie:    " << invCopy << "\n";
+
+    invCopy.removeWeapon(0);
+    std::cout << "\nDupa stergerea primei arme din copie:\n";
+    std::cout << "Original: " << inv << "\n";
+    std::cout << "Copie:    " << invCopy << "\n\n";
+
+    std::cout << "--- Rule of Three: Operator= ---\n";
+    Inventory invAssigned;
+    invAssigned = inv;
+    std::cout << "Atribuit: " << invAssigned << "\n\n";
+  }
+
+  void demoCharacters() {
+    std::cout << "--- Creare Personaje ---\n";
+    hero.pickUpWeapon(axe);
+    hero.pickUpWeapon(hammer);
+    std::cout << hero << "\n\n";
+    std::cout << enemy << "\n\n";
+  }
+
+  void demoCombat() {
+    std::cout << "========================================\n";
+    std::cout << "   LUPTA: " << hero.getName() << " vs " << enemy.getName()
+              << "\n";
+    std::cout << "========================================\n\n";
+
+    int round = 1;
+    while (hero.isAlive() && enemy.isAlive()) {
+      std::cout << "--- Runda " << round << " ---\n";
+
+      bool heroWeaponBroken = hero.getEquippedWeapon().isBroken();
+      int heroBaseDmg = hero.getEquippedWeapon().getDamage();
+      int heroDmg = hero.attackTarget(enemy);
+
+      if (!hero.isAlive()) {
+        std::cout << "  " << hero.getName()
                   << " nu mai este in viata si nu poate ataca!\n";
-      } else if (enemyDmg == 0 && enemyWeaponBroken) {
-        std::cout << "  " << enemy.getName() << " incearca sa atace, dar arma ("
-                  << enemy.getEquippedWeapon().getName()
+      } else if (heroDmg == 0 && heroWeaponBroken) {
+        std::cout << "  " << hero.getName() << " incearca sa atace, dar arma ("
+                  << hero.getEquippedWeapon().getName()
                   << ") este stricata!\n";
-      } else if (enemyDmg > 0) {
-        if (enemyDmg > enemyBaseDmg) {
+      } else if (heroDmg > 0) {
+        if (heroDmg > heroBaseDmg) {
           std::cout << "  ** CRITICAL HIT! **\n";
         }
-        std::cout << "  " << enemy.getName() << " ataca pe " << hero.getName()
-                  << " cu " << enemy.getEquippedWeapon().getName() << " pentru "
-                  << enemyDmg << " damage!\n";
-        if (!hero.isAlive()) {
+        std::cout << "  " << hero.getName() << " ataca pe " << enemy.getName()
+                  << " cu " << hero.getEquippedWeapon().getName() << " pentru "
+                  << heroDmg << " damage!\n";
+        if (!enemy.isAlive()) {
           int xpGained = 1 * 30 + 20;
-          std::cout << "  " << hero.getName() << " a cazut in lupta! (HP: 0)\n";
-          std::cout << "  " << hero.getName() << " a fost invins! "
-                    << enemy.getName() << " castiga " << xpGained << " XP!\n";
+          std::cout << "  " << enemy.getName()
+                    << " a cazut in lupta! (HP: 0)\n";
+          std::cout << "  " << enemy.getName() << " a fost invins! "
+                    << hero.getName() << " castiga " << xpGained << " XP!\n";
         } else {
-          std::cout << "  " << hero.getName() << " are acum " << hero.getHp()
-                    << "/" << hero.getMaxHp() << " HP.\n";
+          std::cout << "  " << enemy.getName() << " are acum " << enemy.getHp()
+                    << "/" << enemy.getMaxHp() << " HP.\n";
         }
       }
-    }
 
-    std::cout << "\n";
-    ++round;
+      if (enemy.isAlive()) {
+        bool enemyWeaponBroken = enemy.getEquippedWeapon().isBroken();
+        int enemyBaseDmg = enemy.getEquippedWeapon().getDamage();
+        int enemyDmg = enemy.attackTarget(hero);
+
+        if (!enemy.isAlive()) {
+          std::cout << "  " << enemy.getName()
+                    << " nu mai este in viata si nu poate ataca!\n";
+        } else if (enemyDmg == 0 && enemyWeaponBroken) {
+          std::cout << "  " << enemy.getName()
+                    << " incearca sa atace, dar arma ("
+                    << enemy.getEquippedWeapon().getName()
+                    << ") este stricata!\n";
+        } else if (enemyDmg > 0) {
+          if (enemyDmg > enemyBaseDmg) {
+            std::cout << "  ** CRITICAL HIT! **\n";
+          }
+          std::cout << "  " << enemy.getName() << " ataca pe "
+                    << hero.getName() << " cu "
+                    << enemy.getEquippedWeapon().getName() << " pentru "
+                    << enemyDmg << " damage!\n";
+          if (!hero.isAlive()) {
+            int xpGained = 1 * 30 + 20;
+            std::cout << "  " << hero.getName()
+                      << " a cazut in lupta! (HP: 0)\n";
+            std::cout << "  " << hero.getName() << " a fost invins! "
+                      << enemy.getName() << " castiga " << xpGained
+                      << " XP!\n";
+          } else {
+            std::cout << "  " << hero.getName() << " are acum "
+                      << hero.getHp() << "/" << hero.getMaxHp() << " HP.\n";
+          }
+        }
+      }
+
+      std::cout << "\n";
+      ++round;
+    }
   }
 
-  // --- 7. Vindecare cu poțiune ---
-  if (hero.isAlive()) {
+  void demoHealing() {
+    if (!hero.isAlive()) return;
+
     std::cout << "--- Dupa Lupta: Vindecare ---\n";
     std::cout << hero.getName() << " are " << hero.getHp() << "/"
               << hero.getMaxHp() << " HP.\n";
@@ -585,67 +604,69 @@ int main() {
     std::cout << "\n" << hero << "\n\n";
   }
 
-  // --- 8. Demonstrăm removeAllBroken ---
-  std::cout << "--- Curatare Inventar ---\n";
-  Weapon fragile("Glass Sword", 30, 1);
-  Weapon tempFragile = fragile;
-  tempFragile.attack(); // stricam arma (durability 1 -> 0)
-  tempFragile.attack();
+  void demoRemoveBroken() {
+    std::cout << "--- Curatare Inventar ---\n";
+    Weapon fragile("Glass Sword", 30, 1);
+    Weapon tempFragile = fragile;
+    tempFragile.attack();
+    tempFragile.attack();
 
-  Inventory cleanupInv;
-  cleanupInv.addWeapon(tempFragile);
-  cleanupInv.addWeapon(sword);
-  cleanupInv.addWeapon(axe);
-  std::cout << "Inainte: " << cleanupInv << "\n";
-  int removed = cleanupInv.removeAllBroken();
-  std::cout << "Arme stricate eliminate: " << removed << "\n";
-  std::cout << "Dupa:    " << cleanupInv << "\n\n";
+    Inventory cleanupInv;
+    cleanupInv.addWeapon(tempFragile);
+    cleanupInv.addWeapon(sword);
+    cleanupInv.addWeapon(axe);
+    std::cout << "Inainte: " << cleanupInv << "\n";
+    int removed = cleanupInv.removeAllBroken();
+    std::cout << "Arme stricate eliminate: " << removed << "\n";
+    std::cout << "Dupa:    " << cleanupInv << "\n\n";
+  }
 
-  // --- 9. Reparare armă ---
-  std::cout << "--- Reparare Arma ---\n";
-  Weapon damagedSword("Rusted Blade", 10, 3);
-  std::cout << "Inainte: " << damagedSword << "\n";
-  damagedSword.repair(50);
-  std::cout << "Dupa reparare (+50): " << damagedSword << "\n\n";
+  void demoRepair() {
+    std::cout << "--- Reparare Arma ---\n";
+    Weapon damagedSword("Rusted Blade", 10, 3);
+    std::cout << "Inainte: " << damagedSword << "\n";
+    damagedSword.repair(50);
+    std::cout << "Dupa reparare (+50): " << damagedSword << "\n\n";
+  }
 
-  // --- 10. Citire de la tastatură ---
-  std::cout << "--- Creare Personaj de la Tastatura ---\n";
-  std::string playerName;
-  int playerHp;
-  std::string weaponName;
-  int weaponDmg;
+  void demoKeyboardInput() {
+    std::cout << "--- Creare Personaj de la Tastatura ---\n";
+    std::string playerName;
+    int playerHp;
+    std::string weaponName;
+    int weaponDmg;
 
-  std::cout << "Nume personaj: ";
-  std::getline(std::cin, playerName);
-  std::cout << "HP initial: ";
-  std::cin >> playerHp;
-  std::cin.ignore();
-  std::cout << "Nume arma: ";
-  std::getline(std::cin, weaponName);
-  std::cout << "Damage arma: ";
-  std::cin >> weaponDmg;
+    std::cout << "Nume personaj: ";
+    std::getline(std::cin, playerName);
+    std::cout << "HP initial: ";
+    std::cin >> playerHp;
+    std::cin.ignore();
+    std::cout << "Nume arma: ";
+    std::getline(std::cin, weaponName);
+    std::cout << "Damage arma: ";
+    std::cin >> weaponDmg;
 
-  Weapon customWeapon(weaponName, weaponDmg, 20);
-  Character customPlayer(playerName, playerHp, 1, customWeapon);
-  std::cout << "\nPersonajul tau:\n" << customPlayer << "\n";
+    Weapon customWeapon(weaponName, weaponDmg, 20);
+    Character customPlayer(playerName, playerHp, 1, customWeapon);
+    std::cout << "\nPersonajul tau:\n" << customPlayer << "\n";
+  }
 
-  // --- 11. Simulare Miscare ---
-  std::cout << "\n========================================\n";
-  std::cout << "   SIMULARE MISCARE\n";
-  std::cout << "========================================\n\n";
+  void demoMovement() {
+    std::cout << "\n========================================\n";
+    std::cout << "   SIMULARE MISCARE\n";
+    std::cout << "========================================\n\n";
 
-  std::cout << hero.getName() << " porneste de la pozitia ("
-            << hero.getX() << ", " << hero.getY() << ")\n\n";
+    std::cout << hero.getName() << " porneste de la pozitia ("
+              << hero.getX() << ", " << hero.getY() << ")\n\n";
 
-  // Simuleaza o patrulare: dreapta, sus, stanga, jos
-  std::array<std::pair<int, int>, 8> moves = {{
-      {1, 0}, {1, 0}, {1, 0},   // 3 pasi la dreapta
-      {0, -1}, {0, -1},          // 2 pasi in sus
-      {-1, 0}, {-1, 0},          // 2 pasi la stanga
-      {0, 1}                     // 1 pas in jos
-  }};
+    std::array<std::pair<int, int>, 8> moves = {{
+        {1, 0}, {1, 0}, {1, 0},
+        {0, -1}, {0, -1},
+        {-1, 0}, {-1, 0},
+        {0, 1}
+    }};
 
-  for (size_t i = 0; i < moves.size(); ++i) {
+    for (size_t i = 0; i < moves.size(); ++i) {
       int dx = moves[i].first;
       int dy = moves[i].second;
 
@@ -658,21 +679,45 @@ int main() {
       hero.move(dx, dy);
       std::cout << "  Pasul " << (i + 1) << ": se misca " << direction
                 << " -> (" << hero.getX() << ", " << hero.getY() << ")\n";
+    }
+
+    std::cout << "\n" << hero.getName() << " a ajuns la ("
+              << hero.getX() << ", " << hero.getY() << ")\n";
+
+    hero.setPosition(10, 5);
+    std::cout << hero.getName() << " se teleporteaza la ("
+              << hero.getX() << ", " << hero.getY() << ")\n";
+
+    std::cout << "\n" << hero << "\n";
   }
 
-  std::cout << "\n" << hero.getName() << " a ajuns la ("
-            << hero.getX() << ", " << hero.getY() << ")\n";
+public:
+  // Ruleaza toate demo-urile in ordine
+  void run() {
+    std::cout << "========================================\n";
+    std::cout << "   ROGUELIKE RPG - Scenariu de Joc\n";
+    std::cout << "========================================\n\n";
 
-  // Teleportare la o pozitie specifica
-  hero.setPosition(10, 5);
-  std::cout << hero.getName() << " se teleporteaza la ("
-            << hero.getX() << ", " << hero.getY() << ")\n";
+    demoWeapons();
+    demoPotions();
+    demoInventory();
+    demoRuleOfThree();
+    demoCharacters();
+    demoCombat();
+    demoHealing();
+    demoRemoveBroken();
+    demoRepair();
+    demoKeyboardInput();
+    demoMovement();
 
-  std::cout << "\n" << hero << "\n";
+    std::cout << "\n========================================\n";
+    std::cout << "   Sfarsit Scenariu\n";
+    std::cout << "========================================\n";
+  }
+};
 
-  std::cout << "\n========================================\n";
-  std::cout << "   Sfarsit Scenariu\n";
-  std::cout << "========================================\n";
-
+int main() {
+  GameDemo demo;
+  demo.run();
   return 0;
 }
