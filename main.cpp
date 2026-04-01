@@ -18,7 +18,7 @@ private:
   int durability;
   int maxDurability;
 
-  // Functie privata: calculeaza daca atacul este critic (20% sansa, x2 damage)
+  // roll crit
   int rollCritical() const {
     static std::mt19937 rng{std::random_device{}()};
     std::uniform_int_distribution<int> dist(1, 5);
@@ -29,13 +29,13 @@ private:
   }
 
 public:
-  // Constructor cu parametri
+
   Weapon(const std::string &name = "Fists", int damage = 2,
          int durability = 100)
       : name(name), damage(damage), durability(durability),
         maxDurability(durability) {}
 
-  // Getters (const)
+
   const std::string &getName() const { return name; }
   int getDamage() const { return damage; }
   int getDurability() const { return durability; }
@@ -43,7 +43,7 @@ public:
 
   bool isBroken() const { return durability <= 0; }
 
-  // Functie non-triviala: ataca si reduce durabilitatea
+
   int attack() {
     if (isBroken()) {
       return 0;
@@ -56,7 +56,7 @@ public:
     return dealt;
   }
 
-  // Functie: repara arma (nu depaseste maxDurability)
+
   void repair(int amount) {
     durability += amount;
     if (durability > maxDurability) {
@@ -64,7 +64,7 @@ public:
     }
   }
 
-  // operator<< pentru afisare
+
 };
 std::ostream &operator<<(std::ostream &os, const Weapon &w) {
   os << "Weapon[" << w.getName() << ", dmg=" << w.getDamage()
@@ -94,18 +94,16 @@ private:
   }
 
 public:
-  // Constructor cu parametri
+
   Potion(const std::string &name = "Unknown Potion", int healAmount = 10,
          int price = 5)
       : name(name), healAmount(healAmount), price(price) {}
 
-  // Getters (const)
+
   const std::string &getName() const { return name; }
   int getHealAmount() const { return healAmount; }
   int getPrice() const { return price; }
 
-  // Functie non-triviala: compara eficienta potiunilor (vindecamant per unitate
-  // de pret)
   bool isStrongerThan(const Potion &other) const {
     if (price == 0 && other.price == 0) {
       return healAmount > other.healAmount;
@@ -141,7 +139,7 @@ private:
   int size;
   int capacity;
 
-  // Functie privata: redimensioneaza array-ul intern
+
   void resize(int newCapacity) {
     Weapon *newWeapons = new Weapon[newCapacity];
     for (int i = 0; i < size; ++i) {
@@ -153,13 +151,11 @@ private:
   }
 
 public:
-  // Constructor cu parametri
+
   explicit Inventory(int capacity = 5)
       : weapons(new Weapon[capacity]), size(0), capacity(capacity) {}
 
-  // --- Rule of Three ---
 
-  // Constructor de copiere (deep copy)
   Inventory(const Inventory &other)
       : weapons(new Weapon[other.capacity]), size(other.size),
         capacity(other.capacity) {
@@ -168,30 +164,29 @@ public:
     }
   }
 
-  // Operator= de copiere (copy and swap)
+
   Inventory &operator=(Inventory other) {
     this->swap(other);
     return *this;
   }
 
-  // Destructor
+
   ~Inventory() { delete[] weapons; }
 
-  // Swap (folosit de copy-and-swap)
+
   void swap(Inventory &other) noexcept {
     std::swap(weapons, other.weapons);
     std::swap(size, other.size);
     std::swap(capacity, other.capacity);
   }
 
-  // --- Functii publice ---
 
   int getSize() const { return size; }
   int getCapacity() const { return capacity; }
   bool isEmpty() const { return size == 0; }
   bool isFull() const { return size >= capacity; }
 
-  // Adauga o arma in inventar (redimensionare automata)
+
   bool addWeapon(const Weapon &w) {
     if (size >= capacity) {
       resize(capacity * 2);
@@ -201,7 +196,7 @@ public:
     return true;
   }
 
-  // Elimina o arma din inventar (prin index)
+
   bool removeWeapon(int index) {
     if (index < 0 || index >= size) {
       return false;
@@ -213,14 +208,13 @@ public:
     return true;
   }
 
-  // Acces la o arma (const)
+
   const Weapon &getWeapon(int index) const { return weapons[index]; }
 
-  // Acces la o arma (non-const, necesar pentru attack care modifica durability)
+  // Acces la o arma (non-const, necesar pentru attack care modifica durability
   Weapon &getWeapon(int index) { return weapons[index]; }
 
-  // Functie non-triviala: gaseste indexul armei cea mai puternica (care nu e
-  // stricata)
+  // cauta arma principala( cea mai puternica)
   int findStrongestIndex() const {
     int bestIndex = -1;
     int bestDamage = -1;
@@ -233,7 +227,7 @@ public:
     return bestIndex;
   }
 
-  // Functie non-triviala: calculeaza damage-ul total al armelor functionale
+  // total damage
   int totalDamage() const {
     int total = 0;
     for (int i = 0; i < size; ++i) {
@@ -244,7 +238,7 @@ public:
     return total;
   }
 
-  // Functie non-triviala: elimina toate armele stricate din inventar
+  // sterge toate armele stricate
   int removeAllBroken() {
     int removed = 0;
     int writeIdx = 0;
@@ -287,11 +281,9 @@ private:
   int posX;
   int posY;
 
-  // Functie privata: calculeaza XP-ul necesar pentru urmatorul nivel
   int xpForNextLevel() const { return level * 50 + 50; }
 
-  // Functie privata: verifica si aplica level up, returneaza nr. de niveluri
-  // castigate
+  // lvl up, daca primeste mult xp odata mai multe lvl de aia return levelsGained
   int checkLevelUp() {
     int levelsGained = 0;
     while (xp >= xpForNextLevel()) {
@@ -306,7 +298,6 @@ private:
   }
 
 public:
-  // Constructor cu parametri
   // Arma primita este adaugata ca slot 0 in inventar (= arma echipata)
   Character(const std::string &name = "Hero", int hp = 100, int level = 1,
             const Weapon &weapon = Weapon(), const Inventory &inv = Inventory(),
@@ -317,7 +308,6 @@ public:
     inventory.addWeapon(weapon);
   }
 
-  // Getters (const)
   const std::string &getName() const { return name; }
   int getHp() const { return hp; }
   int getMaxHp() const { return maxHp; }
@@ -326,12 +316,10 @@ public:
   int getXpForNextLevel() const { return xpForNextLevel(); }
   bool isAlive() const { return hp > 0; }
 
-  // Arma echipata = prima arma din inventar (slot 0)
   const Weapon &getEquippedWeapon() const { return inventory.getWeapon(0); }
 
   const Inventory &getInventory() const { return inventory; }
 
-  // Getteri si setteri pentru coordonate
   int getX() const { return posX; }
   int getY() const { return posY; }
   void setPosition(int x, int y) {
@@ -346,15 +334,12 @@ public:
   // Adauga arma in inventar
   void pickUpWeapon(const Weapon &w) { inventory.addWeapon(w); }
 
-  // --- Functii non-triviale ---
-
-  // Ataca un alt personaj. Returneaza damage-ul dat (0 daca atacul a esuat).
+  // Ataca, returneaza dmg dat
   int attackTarget(Character &target) {
     if (!isAlive()) {
       return 0;
     }
 
-    // Ataca cu arma echipata (slot 0)
     int dealt = inventory.getWeapon(0).attack();
     if (dealt == 0) {
       return 0;
@@ -423,8 +408,6 @@ private:
   Character hero{"Aldric", 120, 1, sword};
   Character enemy{"Goblin", 40, 1, dagger};
 
-  // --- Sectiuni private ale demo-ului ---
-
   void demoWeapons() {
     std::cout << "--- Creare Arme ---\n";
     std::cout << sword << "\n";
@@ -467,7 +450,7 @@ private:
   }
 
   void demoRuleOfThree() {
-    std::cout << "--- Rule of Three: Copy Constructor ---\n";
+    std::cout << "--- Copy Constructor ---\n";
     Inventory inv(3);
     inv.addWeapon(sword);
     inv.addWeapon(dagger);
@@ -717,7 +700,64 @@ public:
 };
 
 int main() {
-  GameDemo demo;
-  demo.run();
+  // GameDemo demo;
+  // demo.run();
+
+  // === SFML GRAPHICAL GAME ===
+  sf::RenderWindow window(sf::VideoMode({800, 600}), "Roguelike RPG");
+  window.setFramerateLimit(60);
+
+  Character hero("Aldric", 120, 1, Weapon("Iron Sword", 15, 10));
+
+  // Load your character sprite from guts.png
+  sf::Texture texRight("assets/guts-right.png");
+  sf::Texture texLeft("assets/guts-left.png");
+  sf::Texture texUp("assets/guts-up.png");
+  sf::Texture texDown("assets/guts-removebg-preview.png");
+  sf::Sprite playerSprite(texDown);
+  playerSprite.setScale({0.5f, 0.5f});
+  playerSprite.setPosition({400.f, 300.f});
+
+  float speed = 200.f;
+  sf::Clock clock;
+
+  // === GAME LOOP ===
+  while (window.isOpen()) {
+    // 1. POLL EVENTS
+    while (auto event = window.pollEvent()) {
+      if (event->is<sf::Event::Closed>()) {
+        window.close();
+      }
+    }
+    // 2. UPDATE (movement with delta time)
+    float dt = clock.restart().asSeconds();
+    sf::Vector2f movement(0.f, 0.f);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+      movement.y -= speed * dt;
+      playerSprite.setTexture(texUp);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)){
+      movement.y += speed * dt;
+      playerSprite.setTexture(texDown);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)){
+      movement.x -= speed * dt;
+      playerSprite.setTexture(texLeft);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+      movement.x += speed * dt;
+      playerSprite.setTexture(texRight);
+    }
+    playerSprite.move(movement);
+
+    // Sync your Character object's position
+    hero.setPosition(static_cast<int>(playerSprite.getPosition().x),
+                     static_cast<int>(playerSprite.getPosition().y));
+    // 3. DRAW
+    window.clear(sf::Color::Black);
+    window.draw(playerSprite);
+    window.display();
+  }
+
   return 0;
 }
