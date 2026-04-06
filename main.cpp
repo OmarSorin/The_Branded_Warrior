@@ -6,7 +6,6 @@
 #include <string>
 #include <thread>
 
-
 #include <SFML/Graphics.hpp>
 
 #include "include/Example.h"
@@ -29,12 +28,10 @@ private:
   }
 
 public:
-
   Weapon(const std::string &name = "Fists", int damage = 2,
          int durability = 100)
       : name(name), damage(damage), durability(durability),
         maxDurability(durability) {}
-
 
   const std::string &getName() const { return name; }
   int getDamage() const { return damage; }
@@ -42,7 +39,6 @@ public:
   int getMaxDurability() const { return maxDurability; }
 
   bool isBroken() const { return durability <= 0; }
-
 
   int attack() {
     if (isBroken()) {
@@ -56,15 +52,12 @@ public:
     return dealt;
   }
 
-
   void repair(int amount) {
     durability += amount;
     if (durability > maxDurability) {
       durability = maxDurability;
     }
   }
-
-
 };
 std::ostream &operator<<(std::ostream &os, const Weapon &w) {
   os << "Weapon[" << w.getName() << ", dmg=" << w.getDamage()
@@ -94,11 +87,9 @@ private:
   }
 
 public:
-
   Potion(const std::string &name = "Unknown Potion", int healAmount = 10,
          int price = 5)
       : name(name), healAmount(healAmount), price(price) {}
-
 
   const std::string &getName() const { return name; }
   int getHealAmount() const { return healAmount; }
@@ -139,7 +130,6 @@ private:
   int size;
   int capacity;
 
-
   void resize(int newCapacity) {
     Weapon *newWeapons = new Weapon[newCapacity];
     for (int i = 0; i < size; ++i) {
@@ -151,10 +141,8 @@ private:
   }
 
 public:
-
   explicit Inventory(int capacity = 5)
       : weapons(new Weapon[capacity]), size(0), capacity(capacity) {}
-
 
   Inventory(const Inventory &other)
       : weapons(new Weapon[other.capacity]), size(other.size),
@@ -164,15 +152,12 @@ public:
     }
   }
 
-
   Inventory &operator=(Inventory other) {
     this->swap(other);
     return *this;
   }
 
-
   ~Inventory() { delete[] weapons; }
-
 
   void swap(Inventory &other) noexcept {
     std::swap(weapons, other.weapons);
@@ -180,12 +165,10 @@ public:
     std::swap(capacity, other.capacity);
   }
 
-
   int getSize() const { return size; }
   int getCapacity() const { return capacity; }
   bool isEmpty() const { return size == 0; }
   bool isFull() const { return size >= capacity; }
-
 
   bool addWeapon(const Weapon &w) {
     if (size >= capacity) {
@@ -195,7 +178,6 @@ public:
     ++size;
     return true;
   }
-
 
   bool removeWeapon(int index) {
     if (index < 0 || index >= size) {
@@ -207,7 +189,6 @@ public:
     --size;
     return true;
   }
-
 
   const Weapon &getWeapon(int index) const { return weapons[index]; }
 
@@ -283,7 +264,8 @@ private:
 
   int xpForNextLevel() const { return level * 50 + 50; }
 
-  // lvl up, daca primeste mult xp odata mai multe lvl de aia return levelsGained
+  // lvl up, daca primeste mult xp odata mai multe lvl de aia return
+  // levelsGained
   int checkLevelUp() {
     int levelsGained = 0;
     while (xp >= xpForNextLevel()) {
@@ -394,6 +376,341 @@ std::ostream &operator<<(std::ostream &os, const Character &c) {
   return os;
 }
 
+enum class TileType { WALL, FLOOR, DOOR, OBSTACLE };
+
+std::ostream &operator<<(std::ostream &os, const TileType &tile) {
+  switch (tile) {
+  case TileType::WALL:
+    os << '#';
+    break;
+  case TileType::FLOOR:
+    os << '.';
+    break;
+  case TileType::DOOR:
+    os << '+';
+    break;
+  case TileType::OBSTACLE:
+    os << 'o';
+    break;
+  }
+  return os;
+}
+
+class Room {
+private:
+  int x, y, width, height;
+
+public:
+  Room(int x, int y, int w, int h) : x(x), y(y), width(w), height(h) {}
+
+  int getX() const { return x; }
+  int getY() const { return y; }
+  int getWidth() const { return width; }
+  int getHeight() const { return height; }
+
+  int centerX() const { return x + width / 2; }
+  int centerY() const { return y + height / 2; }
+
+  bool intersects(const Room &other, int padding = 1) const {
+    return !(x - padding >= other.x + other.width ||
+             x + width + padding <= other.x ||
+             y - padding >= other.y + other.height ||
+             y + height + padding <= other.y);
+  }
+
+  friend std::ostream &operator<<(std::ostream &os, const Room &room);
+};
+
+std::ostream &operator<<(std::ostream &os, const Room &room) {
+  os << "Room[pos=(" << room.x << "," << room.y << "), size=" << room.width
+     << "x" << room.height << ", center=(" << room.centerX() << ","
+     << room.centerY() << ")]";
+  return os;
+}
+
+class Map {
+private:
+  int width;
+  int height;
+  std::vector<std::vector<TileType>> tiles;
+  std::vector<Room> rooms;
+
+  void fillWithWalls() {
+    for (int row = 0; row < height; ++row) {
+      for (int col = 0; col < width; ++col) {
+        tiles[row][col] = TileType::WALL;
+      }
+    }
+  }
+
+  void carveRoom(const Room &room) {
+    for (int row = room.getY(); row < room.getY() + room.getHeight(); ++row) {
+      for (int col = room.getX(); col < room.getX() + room.getWidth(); ++col) {
+        if (isInBounds(col, row)) {
+          tiles[row][col] = TileType::FLOOR;
+        }
+      }
+    }
+  }
+
+  void carveHorizontalCorridor(int x1, int x2, int y) {
+    int startX = std::min(x1, x2);
+    int endX = std::max(x1, x2);
+    for (int col = startX; col <= endX; ++col) {
+      if (isInBounds(col, y)) {
+        tiles[y][col] = TileType::FLOOR;
+      }
+    }
+  }
+
+  void carveVerticalCorridor(int y1, int y2, int x) {
+    int startY = std::min(y1, y2);
+    int endY = std::max(y1, y2);
+    for (int row = startY; row <= endY; ++row) {
+      if (isInBounds(x, row)) {
+        tiles[row][x] = TileType::FLOOR;
+      }
+    }
+  }
+
+  void connectRooms(const Room &a, const Room &b) {
+    static std::mt19937 rng{std::random_device{}()};
+    std::uniform_int_distribution<int> coinFlip(0, 1);
+
+    int ax = a.centerX();
+    int ay = a.centerY();
+    int bx = b.centerX();
+    int by = b.centerY();
+
+    if (coinFlip(rng) == 0) {
+      carveHorizontalCorridor(ax, bx, ay);
+      carveVerticalCorridor(ay, by, bx);
+    } else {
+      carveVerticalCorridor(ay, by, ax);
+      carveHorizontalCorridor(ax, bx, by);
+    }
+  }
+
+  void placeDoors() {
+    for (int row = 1; row < height - 1; ++row) {
+      for (int col = 1; col < width - 1; ++col) {
+        if (tiles[row][col] != TileType::FLOOR)
+          continue;
+
+        bool wallNorth = tiles[row - 1][col] == TileType::WALL;
+        bool wallSouth = tiles[row + 1][col] == TileType::WALL;
+        bool wallWest = tiles[row][col - 1] == TileType::WALL;
+        bool wallEast = tiles[row][col + 1] == TileType::WALL;
+
+        bool floorNorth = tiles[row - 1][col] == TileType::FLOOR ||
+                          tiles[row - 1][col] == TileType::DOOR;
+        bool floorSouth = tiles[row + 1][col] == TileType::FLOOR ||
+                          tiles[row + 1][col] == TileType::DOOR;
+        bool floorWest = tiles[row][col - 1] == TileType::FLOOR ||
+                         tiles[row][col - 1] == TileType::DOOR;
+        bool floorEast = tiles[row][col + 1] == TileType::FLOOR ||
+                         tiles[row][col + 1] == TileType::DOOR;
+
+        bool verticalPassage = wallWest && wallEast && floorNorth && floorSouth;
+        bool horizontalPassage =
+            wallNorth && wallSouth && floorWest && floorEast;
+
+        if (verticalPassage || horizontalPassage) {
+          tiles[row][col] = TileType::DOOR;
+        }
+      }
+    }
+  }
+
+  bool isAdjacentToDoor(int x, int y) const {
+    return (isInBounds(x, y - 1) && tiles[y - 1][x] == TileType::DOOR) ||
+           (isInBounds(x, y + 1) && tiles[y + 1][x] == TileType::DOOR) ||
+           (isInBounds(x - 1, y) && tiles[y][x - 1] == TileType::DOOR) ||
+           (isInBounds(x + 1, y) && tiles[y][x + 1] == TileType::DOOR);
+  }
+
+  void placeObstacles(int count) {
+    static std::mt19937 rng{std::random_device{}()};
+    std::uniform_int_distribution<int> distX(1, width - 2);
+    std::uniform_int_distribution<int> distY(1, height - 2);
+
+    int placed = 0;
+    int attempts = 0;
+    while (placed < count && attempts < count * 10) {
+      int x = distX(rng);
+      int y = distY(rng);
+      ++attempts;
+
+      if (tiles[y][x] == TileType::FLOOR &&
+          countAdjacentWalkable(x, y) >= 6 &&
+          !isAdjacentToDoor(x, y)) {
+        tiles[y][x] = TileType::OBSTACLE;
+        ++placed;
+      }
+    }
+  }
+
+public:
+  Map(int width = 50, int height = 30)
+      : width(width), height(height),
+        tiles(height, std::vector<TileType>(width, TileType::WALL)) {}
+
+  void generate(int numRooms = 6, int obstacleCount = 10) {
+    static std::mt19937 rng{std::random_device{}()};
+
+    fillWithWalls();
+    rooms.clear();
+
+    int minRoomSize = 4;
+    int maxRoomSize = 9;
+
+    std::uniform_int_distribution<int> roomW(minRoomSize, maxRoomSize);
+    std::uniform_int_distribution<int> roomH(minRoomSize, maxRoomSize);
+
+    int maxAttempts = numRooms * 20;
+    for (int attempt = 0;
+         attempt < maxAttempts && static_cast<int>(rooms.size()) < numRooms;
+         ++attempt) {
+      int w = roomW(rng);
+      int h = roomH(rng);
+
+      std::uniform_int_distribution<int> posX(1, width - w - 1);
+      std::uniform_int_distribution<int> posY(1, height - h - 1);
+
+      Room newRoom(posX(rng), posY(rng), w, h);
+
+      bool overlaps = false;
+      for (const auto &existing : rooms) {
+        if (newRoom.intersects(existing, 2)) {
+          overlaps = true;
+          break;
+        }
+      }
+
+      if (!overlaps) {
+        carveRoom(newRoom);
+        if (!rooms.empty()) {
+          connectRooms(rooms.back(), newRoom);
+        }
+        rooms.push_back(newRoom);
+      }
+    }
+
+    placeDoors();
+    placeObstacles(obstacleCount);
+  }
+
+  int getWidth() const { return width; }
+  int getHeight() const { return height; }
+
+  TileType getTile(int x, int y) const {
+    if (!isInBounds(x, y))
+      return TileType::WALL;
+    return tiles[y][x];
+  }
+
+  bool isInBounds(int x, int y) const {
+    return x >= 0 && x < width && y >= 0 && y < height;
+  }
+
+  bool isWalkable(int x, int y) const {
+    if (!isInBounds(x, y))
+      return false;
+    TileType t = tiles[y][x];
+    return t == TileType::FLOOR || t == TileType::DOOR;
+  }
+
+  const std::vector<Room> &getRooms() const { return rooms; }
+
+  std::pair<int, int> getRandomFloorTile() const {
+    static std::mt19937 rng{std::random_device{}()};
+
+    std::vector<std::pair<int, int>> floorTiles;
+    for (int row = 0; row < height; ++row) {
+      for (int col = 0; col < width; ++col) {
+        if (tiles[row][col] == TileType::FLOOR) {
+          floorTiles.emplace_back(col, row);
+        }
+      }
+    }
+
+    if (floorTiles.empty()) {
+      return {1, 1};
+    }
+
+    std::uniform_int_distribution<int> dist(
+        0, static_cast<int>(floorTiles.size()) - 1);
+    return floorTiles[dist(rng)];
+  }
+
+  int countAdjacentWalkable(int x, int y) const {
+    int count = 0;
+    for (int dy = -1; dy <= 1; ++dy) {
+      for (int dx = -1; dx <= 1; ++dx) {
+        if (dx == 0 && dy == 0)
+          continue;
+        if (isWalkable(x + dx, y + dy)) {
+          ++count;
+        }
+      }
+    }
+    return count;
+  }
+
+  bool hasLineOfSight(int x1, int y1, int x2, int y2) const {
+    int dx = std::abs(x2 - x1);
+    int dy = std::abs(y2 - y1);
+    int sx = (x1 < x2) ? 1 : -1;
+    int sy = (y1 < y2) ? 1 : -1;
+    int err = dx - dy;
+
+    int cx = x1;
+    int cy = y1;
+
+    while (cx != x2 || cy != y2) {
+      if ((cx != x1 || cy != y1) && !isWalkable(cx, cy)) {
+        return false;
+      }
+
+      int err2 = 2 * err;
+      if (err2 > -dy) {
+        err -= dy;
+        cx += sx;
+      }
+      if (err2 < dx) {
+        err += dx;
+        cy += sy;
+      }
+    }
+
+    return true;
+  }
+
+  sf::Color getTileColor(int x, int y) const {
+    switch (getTile(x, y)) {
+    case TileType::WALL:     return sf::Color(40, 40, 50);
+    case TileType::FLOOR:    return sf::Color(120, 110, 100);
+    case TileType::DOOR:     return sf::Color(160, 120, 60);
+    case TileType::OBSTACLE: return sf::Color(80, 80, 90);
+    default:                 return sf::Color::Black;
+    }
+  }
+};
+
+std::ostream &operator<<(std::ostream &os, const Map &map) {
+  for (int row = 0; row < map.getHeight(); ++row) {
+    for (int col = 0; col < map.getWidth(); ++col) {
+      os << map.getTile(col, row);
+    }
+    os << '\n';
+  }
+  os << "Rooms: " << map.getRooms().size();
+  for (size_t i = 0; i < map.getRooms().size(); ++i) {
+    os << "\n  " << (i + 1) << ". " << map.getRooms()[i];
+  }
+  return os;
+}
+
 class GameDemo {
 private:
   Weapon sword{"Iron Sword", 15, 10};
@@ -428,8 +745,7 @@ private:
       std::cout << smallPotion.getName()
                 << " are un raport heal/pret mai bun.\n";
     } else {
-      std::cout << bigPotion.getName()
-                << " are un raport heal/pret mai bun.\n";
+      std::cout << bigPotion.getName() << " are un raport heal/pret mai bun.\n";
     }
     std::cout << "\n";
   }
@@ -498,8 +814,7 @@ private:
                   << " nu mai este in viata si nu poate ataca!\n";
       } else if (heroDmg == 0 && heroWeaponBroken) {
         std::cout << "  " << hero.getName() << " incearca sa atace, dar arma ("
-                  << hero.getEquippedWeapon().getName()
-                  << ") este stricata!\n";
+                  << hero.getEquippedWeapon().getName() << ") este stricata!\n";
       } else if (heroDmg > 0) {
         if (heroDmg > heroBaseDmg) {
           std::cout << "  ** CRITICAL HIT! **\n";
@@ -536,20 +851,18 @@ private:
           if (enemyDmg > enemyBaseDmg) {
             std::cout << "  ** CRITICAL HIT! **\n";
           }
-          std::cout << "  " << enemy.getName() << " ataca pe "
-                    << hero.getName() << " cu "
-                    << enemy.getEquippedWeapon().getName() << " pentru "
-                    << enemyDmg << " damage!\n";
+          std::cout << "  " << enemy.getName() << " ataca pe " << hero.getName()
+                    << " cu " << enemy.getEquippedWeapon().getName()
+                    << " pentru " << enemyDmg << " damage!\n";
           if (!hero.isAlive()) {
             int xpGained = 1 * 30 + 20;
             std::cout << "  " << hero.getName()
                       << " a cazut in lupta! (HP: 0)\n";
             std::cout << "  " << hero.getName() << " a fost invins! "
-                      << enemy.getName() << " castiga " << xpGained
-                      << " XP!\n";
+                      << enemy.getName() << " castiga " << xpGained << " XP!\n";
           } else {
-            std::cout << "  " << hero.getName() << " are acum "
-                      << hero.getHp() << "/" << hero.getMaxHp() << " HP.\n";
+            std::cout << "  " << hero.getName() << " are acum " << hero.getHp()
+                      << "/" << hero.getMaxHp() << " HP.\n";
           }
         }
       }
@@ -560,7 +873,8 @@ private:
   }
 
   void demoHealing() {
-    if (!hero.isAlive()) return;
+    if (!hero.isAlive())
+      return;
 
     std::cout << "--- Dupa Lupta: Vindecare ---\n";
     std::cout << hero.getName() << " are " << hero.getHp() << "/"
@@ -639,37 +953,38 @@ private:
     std::cout << "   SIMULARE MISCARE\n";
     std::cout << "========================================\n\n";
 
-    std::cout << hero.getName() << " porneste de la pozitia ("
-              << hero.getX() << ", " << hero.getY() << ")\n\n";
+    std::cout << hero.getName() << " porneste de la pozitia (" << hero.getX()
+              << ", " << hero.getY() << ")\n\n";
 
-    std::array<std::pair<int, int>, 8> moves = {{
-        {1, 0}, {1, 0}, {1, 0},
-        {0, -1}, {0, -1},
-        {-1, 0}, {-1, 0},
-        {0, 1}
-    }};
+    std::array<std::pair<int, int>, 8> moves = {
+        {{1, 0}, {1, 0}, {1, 0}, {0, -1}, {0, -1}, {-1, 0}, {-1, 0}, {0, 1}}};
 
     for (size_t i = 0; i < moves.size(); ++i) {
       int dx = moves[i].first;
       int dy = moves[i].second;
 
       std::string direction;
-      if (dx > 0) direction = "dreapta";
-      else if (dx < 0) direction = "stanga";
-      else if (dy > 0) direction = "jos";
-      else direction = "sus";
+      if (dx > 0)
+        direction = "dreapta";
+      else if (dx < 0)
+        direction = "stanga";
+      else if (dy > 0)
+        direction = "jos";
+      else
+        direction = "sus";
 
       hero.move(dx, dy);
       std::cout << "  Pasul " << (i + 1) << ": se misca " << direction
                 << " -> (" << hero.getX() << ", " << hero.getY() << ")\n";
     }
 
-    std::cout << "\n" << hero.getName() << " a ajuns la ("
-              << hero.getX() << ", " << hero.getY() << ")\n";
+    std::cout << "\n"
+              << hero.getName() << " a ajuns la (" << hero.getX() << ", "
+              << hero.getY() << ")\n";
 
     hero.setPosition(10, 5);
-    std::cout << hero.getName() << " se teleporteaza la ("
-              << hero.getX() << ", " << hero.getY() << ")\n";
+    std::cout << hero.getName() << " se teleporteaza la (" << hero.getX()
+              << ", " << hero.getY() << ")\n";
 
     std::cout << "\n" << hero << "\n";
   }
@@ -703,58 +1018,128 @@ int main() {
   // GameDemo demo;
   // demo.run();
 
-  // === SFML GRAPHICAL GAME ===
-  sf::RenderWindow window(sf::VideoMode({800, 600}), "Roguelike RPG");
+  // === MAP SETUP ===
+  const int tileSize = 16; // pixels per tile
+  Map dungeon(50, 37);     // 50x37 tiles = 800x592 pixels
+  dungeon.generate(8, 12);
+
+  // === SFML WINDOW ===
+  const int viewWidthTiles = 20;  // how many tiles the camera shows horizontally
+  const int viewHeightTiles = 15; // how many tiles the camera shows vertically
+  sf::RenderWindow window(
+      sf::VideoMode({static_cast<unsigned>(viewWidthTiles * tileSize),
+                     static_cast<unsigned>(viewHeightTiles * tileSize)}),
+      "Roguelike RPG");
   window.setFramerateLimit(60);
 
+  // === HERO SETUP ===
   Character hero("Aldric", 120, 1, Weapon("Iron Sword", 15, 10));
+  auto [spawnX, spawnY] = dungeon.getRandomFloorTile();
+  hero.setPosition(spawnX, spawnY);
 
-  // Load your character sprite from guts.png
+  // === SPRITES ===
   sf::Texture texRight("assets/guts-right.png");
   sf::Texture texLeft("assets/guts-left.png");
   sf::Texture texUp("assets/guts-up.png");
   sf::Texture texDown("assets/guts-removebg-preview.png");
   sf::Sprite playerSprite(texDown);
-  playerSprite.setScale({0.5f, 0.5f});
-  playerSprite.setPosition({400.f, 300.f});
 
-  float speed = 200.f;
-  sf::Clock clock;
+  // Scale sprite to fit one tile
+  auto texSize = texDown.getSize();
+  float scaleX = static_cast<float>(tileSize) / static_cast<float>(texSize.x);
+  float scaleY = static_cast<float>(tileSize) / static_cast<float>(texSize.y);
+  playerSprite.setScale({scaleX, scaleY});
+  playerSprite.setPosition(
+      {static_cast<float>(hero.getX() * tileSize),
+       static_cast<float>(hero.getY() * tileSize)});
+
+  // === TILE SHAPE (reused for drawing) ===
+  sf::RectangleShape tileShape(sf::Vector2f(
+      static_cast<float>(tileSize), static_cast<float>(tileSize)));
+
+  // === CAMERA ===
+  sf::View camera(sf::FloatRect(
+      {0.f, 0.f},
+      {static_cast<float>(viewWidthTiles * tileSize),
+       static_cast<float>(viewHeightTiles * tileSize)}));
+
+  // Helper to center camera on player and clamp to map edges
+  float halfW = static_cast<float>(viewWidthTiles * tileSize) / 2.f;
+  float halfH = static_cast<float>(viewHeightTiles * tileSize) / 2.f;
+  float mapW = static_cast<float>(dungeon.getWidth() * tileSize);
+  float mapH = static_cast<float>(dungeon.getHeight() * tileSize);
+
+  auto updateCamera = [&]() {
+    float cx = static_cast<float>(hero.getX() * tileSize) + tileSize / 2.f;
+    float cy = static_cast<float>(hero.getY() * tileSize) + tileSize / 2.f;
+
+    // Clamp so camera doesn't go past map edges
+    if (cx < halfW) cx = halfW;
+    if (cy < halfH) cy = halfH;
+    if (cx > mapW - halfW) cx = mapW - halfW;
+    if (cy > mapH - halfH) cy = mapH - halfH;
+
+    camera.setCenter({cx, cy});
+    window.setView(camera);
+  };
+
+  updateCamera();
 
   // === GAME LOOP ===
   while (window.isOpen()) {
-    // 1. POLL EVENTS
+    // 1. POLL EVENTS — one key press = one tile move
     while (auto event = window.pollEvent()) {
       if (event->is<sf::Event::Closed>()) {
         window.close();
       }
-    }
-    // 2. UPDATE (movement with delta time)
-    float dt = clock.restart().asSeconds();
-    sf::Vector2f movement(0.f, 0.f);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-      movement.y -= speed * dt;
-      playerSprite.setTexture(texUp);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)){
-      movement.y += speed * dt;
-      playerSprite.setTexture(texDown);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)){
-      movement.x -= speed * dt;
-      playerSprite.setTexture(texLeft);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-      movement.x += speed * dt;
-      playerSprite.setTexture(texRight);
-    }
-    playerSprite.move(movement);
 
-    // Sync your Character object's position
-    hero.setPosition(static_cast<int>(playerSprite.getPosition().x),
-                     static_cast<int>(playerSprite.getPosition().y));
-    // 3. DRAW
+      if (auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+        int dx = 0, dy = 0;
+
+        if (keyPressed->code == sf::Keyboard::Key::W) {
+          dy = -1;
+          playerSprite.setTexture(texUp);
+        } else if (keyPressed->code == sf::Keyboard::Key::S) {
+          dy = 1;
+          playerSprite.setTexture(texDown);
+        } else if (keyPressed->code == sf::Keyboard::Key::A) {
+          dx = -1;
+          playerSprite.setTexture(texLeft);
+        } else if (keyPressed->code == sf::Keyboard::Key::D) {
+          dx = 1;
+          playerSprite.setTexture(texRight);
+        }
+
+        int newX = hero.getX() + dx;
+        int newY = hero.getY() + dy;
+
+        if (dungeon.isWalkable(newX, newY)) {
+          hero.setPosition(newX, newY);
+          playerSprite.setPosition(
+              {static_cast<float>(newX * tileSize),
+               static_cast<float>(newY * tileSize)});
+          updateCamera();
+        }
+      }
+    }
+
+    // 2. DRAW
     window.clear(sf::Color::Black);
+
+    // Draw the map tiles
+    for (int row = 0; row < dungeon.getHeight(); ++row) {
+      for (int col = 0; col < dungeon.getWidth(); ++col) {
+        tileShape.setPosition(
+            {static_cast<float>(col * tileSize),
+             static_cast<float>(row * tileSize)});
+
+        tileShape.setFillColor(dungeon.getTileColor(col, row));
+
+        window.draw(tileShape);
+      }
+    }
+
+    // Draw the player on top
     window.draw(playerSprite);
     window.display();
   }
