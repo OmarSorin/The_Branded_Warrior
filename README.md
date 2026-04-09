@@ -2,33 +2,14 @@
 
 Un joc 2D, rogue-like despre aventura si lupta. Va fi un joc turn-based in care scopul este sa explorezi o harta si sa gasesti calea de iesire. Pe parcurs vei intalni monstrii, care vor putea fi evitati prin traversarea hartii grid-like sau vor putea fi infruntati. Vor exista diferite tipuri de monstrii, desigur, cu statistici si pattern-uri de atac diferite. Player-ul va dispune si de potiuni de heal( ulterior si de alte efecte, hopefully) care vor fi consumate intr-un turn. Doresc sa implementez si diferite clase/arme/armura, dar voi vedea pe parcurs.
 
+Functionalities:
 
+W- move upwards
+A- move to the left
+S- move downwards
+D- move to the left
 
-
-### Tema 0
-
-- [ ] Nume proiect (poate fi schimbat ulterior)
-- [ ] Scurtă descriere a temei alese, ce v-ați propus să implementați
-
-## Tema 1
-
-#### Cerințe
-- [ ] definirea a minim **3-4 clase** folosind compunere cu clasele definite de voi; moștenirile nu se iau în considerare aici
-- [ ] constructori de inițializare cu parametri pentru fiecare clasă
-- [ ] pentru o aceeași (singură) clasă: constructor de copiere, `operator=` de copiere, destructor
-<!-- - [ ] pentru o altă clasă: constructor de mutare, `operator=` de mutare, destructor -->
-<!-- - [ ] pentru o altă clasă: toate cele 5 funcții membru speciale -->
-- [ ] `operator<<` pentru **toate** clasele pentru afișare (`std::ostream`) folosind compunere de apeluri cu `operator<<`
-- [ ] cât mai multe `const` (unde este cazul) și funcții `private`
-- [ ] implementarea a minim 3 funcții membru publice pentru funcționalități netriviale specifice temei alese, dintre care cel puțin 1-2 funcții mai complexe
-  - nu doar citiri/afișări sau adăugat/șters elemente într-un/dintr-un vector
-- [ ] scenariu de utilizare **cu sens** a claselor definite:
-  - crearea de obiecte și apelarea tuturor funcțiilor membru publice în main
-  - vor fi adăugate în fișierul `tastatura.txt` DOAR exemple de date de intrare de la tastatură (dacă există); dacă aveți nevoie de date din fișiere, creați alte fișiere separat
-- [ ] minim 52-60% din codul propriu să fie C++, `.gitattributes` configurat corect
-- [ ] tag de `git`: de exemplu `v0.1`
-- [ ] serviciu de integrare continuă (CI) cu **toate bifele**; exemplu: GitHub Actions
-- [ ] code review #1 2 proiecte
+Random map generation.
 
 ## Tema 2
 
