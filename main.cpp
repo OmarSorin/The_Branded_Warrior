@@ -419,7 +419,6 @@ public:
   }
 
 };
-
 std::ostream &operator<<(std::ostream &os, const Room &room) {
   os << "Room[pos=(" << room.getX() << "," << room.getY() << "), size=" << room.getWidth()
      << "x" << room.getHeight() << ", center=(" << room.centerX() << ","
