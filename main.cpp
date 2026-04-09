@@ -418,12 +418,11 @@ public:
              y + height + padding <= other.y);
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const Room &room);
 };
 
 std::ostream &operator<<(std::ostream &os, const Room &room) {
-  os << "Room[pos=(" << room.x << "," << room.y << "), size=" << room.width
-     << "x" << room.height << ", center=(" << room.centerX() << ","
+  os << "Room[pos=(" << room.getX() << "," << room.getY() << "), size=" << room.getWidth()
+     << "x" << room.getHeight() << ", center=(" << room.centerX() << ","
      << room.centerY() << ")]";
   return os;
 }
