@@ -4,10 +4,10 @@ Un joc 2D, rogue-like despre aventura si lupta. Va fi un joc turn-based in care 
 
 Functionalities:
 
-W- move upwards
-A- move to the left
-S- move downwards
-D- move to the left
+W- move upwards  
+A- move to the left  
+S- move downwards  
+D- move to the left  
 
 Random map generation.
 
