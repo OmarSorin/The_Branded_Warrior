@@ -24,8 +24,6 @@ Character::Character(const std::string &name, int hp, int level,
   inventory.addWeapon(weapon);
 }
 
-int Character::getXpForNextLevel() const { return xpForNextLevel(); }
-
 void Character::setPosition(int x, int y) {
   posX = x;
   posY = y;

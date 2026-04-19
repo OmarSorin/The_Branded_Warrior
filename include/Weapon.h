@@ -20,7 +20,9 @@ public:
 
   const std::string &getName() const { return name; }
   int getDamage() const { return damage; }
+  // cppcheck-suppress unusedFunction
   int getDurability() const { return durability; }
+  // cppcheck-suppress unusedFunction
   int getMaxDurability() const { return maxDurability; }
 
   bool isBroken() const { return durability <= 0; }

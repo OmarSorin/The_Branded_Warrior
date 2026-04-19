@@ -18,7 +18,9 @@ public:
            int price = 5);
 
   const std::string &getName() const { return name; }
+  // cppcheck-suppress unusedFunction
   int getHealAmount() const { return healAmount; }
+  // cppcheck-suppress unusedFunction
   int getPrice() const { return price; }
 
   bool isStrongerThan(const Potion &other) const;

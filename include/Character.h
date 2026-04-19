@@ -29,16 +29,23 @@ public:
             const Weapon &weapon = Weapon(), const Inventory &inv = Inventory(),
             int posX = 0, int posY = 0);
 
+  // cppcheck-suppress unusedFunction
   const std::string &getName() const { return name; }
+  // cppcheck-suppress unusedFunction
   int getHp() const { return hp; }
+  // cppcheck-suppress unusedFunction
   int getMaxHp() const { return maxHp; }
+  // cppcheck-suppress unusedFunction
   int getLevel() const { return level; }
+  // cppcheck-suppress unusedFunction
   int getXp() const { return xp; }
-  int getXpForNextLevel() const;
+  // cppcheck-suppress unusedFunction
+  int getXpForNextLevel() const { return xpForNextLevel(); }
   bool isAlive() const { return hp > 0; }
 
   const Weapon &getEquippedWeapon() const { return inventory.getWeapon(0); }
 
+  // cppcheck-suppress unusedFunction
   const Inventory &getInventory() const { return inventory; }
 
   int getX() const { return posX; }

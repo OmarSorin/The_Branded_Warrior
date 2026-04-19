@@ -15,7 +15,9 @@ public:
 
   // Rule of Zero: std::vector handles copy, move, and destruction automatically
 
+  // cppcheck-suppress unusedFunction
   int getSize() const { return static_cast<int>(weapons.size()); }
+  // cppcheck-suppress unusedFunction
   int getCapacity() const { return static_cast<int>(weapons.capacity()); }
   // cppcheck-suppress unusedFunction
   bool isEmpty() const { return weapons.empty(); }
