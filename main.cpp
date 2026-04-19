@@ -6,8 +6,8 @@
 #include "Weapon.h"
 
 int main() {
-  // GameDemo demo;
-  // demo.run();
+  GameDemo demo;
+  demo.run();
 
   // === MAP SETUP ===
   const int tileSize = 16; // pixels per tile
