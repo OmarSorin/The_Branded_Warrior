@@ -268,6 +268,7 @@ void GameDemo::demoMovement() {
   std::cout << "\n" << hero << "\n";
 }
 
+// cppcheck-suppress unusedFunction
 void GameDemo::run() {
   std::cout << "========================================\n";
   std::cout << "   ROGUELIKE RPG - Scenariu de Joc\n";
