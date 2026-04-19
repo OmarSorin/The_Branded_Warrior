@@ -22,6 +22,7 @@ public:
   // cppcheck-suppress unusedFunction
   bool isEmpty() const { return weapons.empty(); }
   // cppcheck-suppress unusedFunction
+  // cppcheck-suppress functionStatic
   bool isFull() const { return false; } // vector grows automatically
 
   bool addWeapon(const Weapon &w);
