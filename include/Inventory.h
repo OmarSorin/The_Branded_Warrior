@@ -3,32 +3,24 @@
 
 #include "Weapon.h"
 #include <ostream>
+#include <vector>
 
 class Inventory {
 private:
-  Weapon *weapons;
-  int size;
-  int capacity;
-
-  void resize(int newCapacity);
+  std::vector<Weapon> weapons;
 
 public:
+  // Reserve space upfront; vector grows automatically if needed
   explicit Inventory(int capacity = 5);
 
-  Inventory(const Inventory &other);
+  // Rule of Zero: std::vector handles copy, move, and destruction automatically
 
-  Inventory &operator=(Inventory other);
-
-  ~Inventory();
-
-  void swap(Inventory &other) noexcept;
-
-  int getSize() const { return size; }
-  int getCapacity() const { return capacity; }
+  int getSize() const { return static_cast<int>(weapons.size()); }
+  int getCapacity() const { return static_cast<int>(weapons.capacity()); }
   // cppcheck-suppress unusedFunction
-  bool isEmpty() const { return size == 0; }
+  bool isEmpty() const { return weapons.empty(); }
   // cppcheck-suppress unusedFunction
-  bool isFull() const { return size >= capacity; }
+  bool isFull() const { return false; } // vector grows automatically
 
   bool addWeapon(const Weapon &w);
 
@@ -36,10 +28,10 @@ public:
 
   const Weapon &getWeapon(int index) const { return weapons[index]; }
 
-  // Acces la o arma (non-const, necesar pentru attack care modifica durability
+  // Acces la o arma (non-const, necesar pentru attack care modifica durability)
   Weapon &getWeapon(int index) { return weapons[index]; }
 
-  // cauta arma principala( cea mai puternica)
+  // cauta arma principala (cea mai puternica)
   int findStrongestIndex() const;
 
   // total damage

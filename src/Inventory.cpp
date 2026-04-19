@@ -2,64 +2,27 @@
 
 #include <algorithm>
 
-void Inventory::resize(int newCapacity) {
-  Weapon *newWeapons = new Weapon[newCapacity];
-  for (int i = 0; i < size; ++i) {
-    newWeapons[i] = weapons[i];
-  }
-  delete[] weapons;
-  weapons = newWeapons;
-  capacity = newCapacity;
-}
-
-Inventory::Inventory(int capacity)
-    : weapons(new Weapon[capacity]), size(0), capacity(capacity) {}
-
-Inventory::Inventory(const Inventory &other)
-    : weapons(new Weapon[other.capacity]), size(other.size),
-      capacity(other.capacity) {
-  for (int i = 0; i < size; ++i) {
-    weapons[i] = other.weapons[i];
-  }
-}
-
-Inventory &Inventory::operator=(Inventory other) {
-  this->swap(other);
-  return *this;
-}
-
-Inventory::~Inventory() { delete[] weapons; }
-
-void Inventory::swap(Inventory &other) noexcept {
-  std::swap(weapons, other.weapons);
-  std::swap(size, other.size);
-  std::swap(capacity, other.capacity);
+Inventory::Inventory(int capacity) {
+  weapons.reserve(capacity);
 }
 
 bool Inventory::addWeapon(const Weapon &w) {
-  if (size >= capacity) {
-    resize(capacity * 2);
-  }
-  weapons[size] = w;
-  ++size;
+  weapons.push_back(w);
   return true;
 }
 
 bool Inventory::removeWeapon(int index) {
-  if (index < 0 || index >= size) {
+  if (index < 0 || index >= static_cast<int>(weapons.size())) {
     return false;
   }
-  for (int i = index; i < size - 1; ++i) {
-    weapons[i] = weapons[i + 1];
-  }
-  --size;
+  weapons.erase(weapons.begin() + index);
   return true;
 }
 
 int Inventory::findStrongestIndex() const {
   int bestIndex = -1;
   int bestDamage = -1;
-  for (int i = 0; i < size; ++i) {
+  for (int i = 0; i < static_cast<int>(weapons.size()); ++i) {
     if (!weapons[i].isBroken() && weapons[i].getDamage() > bestDamage) {
       bestDamage = weapons[i].getDamage();
       bestIndex = i;
@@ -70,29 +33,20 @@ int Inventory::findStrongestIndex() const {
 
 int Inventory::totalDamage() const {
   int total = 0;
-  for (int i = 0; i < size; ++i) {
-    if (!weapons[i].isBroken()) {
-      total += weapons[i].getDamage();
+  for (const auto &w : weapons) {
+    if (!w.isBroken()) {
+      total += w.getDamage();
     }
   }
   return total;
 }
 
 int Inventory::removeAllBroken() {
-  int removed = 0;
-  int writeIdx = 0;
-  for (int readIdx = 0; readIdx < size; ++readIdx) {
-    if (!weapons[readIdx].isBroken()) {
-      if (writeIdx != readIdx) {
-        weapons[writeIdx] = weapons[readIdx];
-      }
-      ++writeIdx;
-    } else {
-      ++removed;
-    }
-  }
-  size = writeIdx;
-  return removed;
+  int before = static_cast<int>(weapons.size());
+  auto newEnd = std::remove_if(weapons.begin(), weapons.end(),
+                               [](const Weapon &w) { return w.isBroken(); });
+  weapons.erase(newEnd, weapons.end());
+  return before - static_cast<int>(weapons.size());
 }
 
 std::ostream &operator<<(std::ostream &os, const Inventory &inv) {
