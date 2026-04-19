@@ -28,12 +28,13 @@ private:
   void demoCombat();
   void demoHealing();
   void demoRemoveBroken();
-  void demoRepair();
-  void demoKeyboardInput();
+  static void demoRepair();
+  static void demoKeyboardInput();
   void demoMovement();
 
 public:
   // Ruleaza toate demo-urile in ordine
+  // cppcheck-suppress unusedFunction
   void run();
 };
 

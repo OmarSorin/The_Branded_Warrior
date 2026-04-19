@@ -11,11 +11,11 @@ private:
   int price;
 
   // 50% sansa de lucky heal: +3-5 HP bonus
-  int rollLuckyHeal() const;
+  static int rollLuckyHeal();
 
 public:
-  Potion(const std::string &name = "Unknown Potion", int healAmount = 10,
-         int price = 5);
+  explicit Potion(const std::string &name = "Unknown Potion", int healAmount = 10,
+           int price = 5);
 
   const std::string &getName() const { return name; }
   int getHealAmount() const { return healAmount; }

@@ -25,7 +25,7 @@ private:
 
 public:
   // Arma primita este adaugata ca slot 0 in inventar (= arma echipata)
-  Character(const std::string &name = "Hero", int hp = 100, int level = 1,
+  explicit Character(const std::string &name = "Hero", int hp = 100, int level = 1,
             const Weapon &weapon = Weapon(), const Inventory &inv = Inventory(),
             int posX = 0, int posY = 0);
 

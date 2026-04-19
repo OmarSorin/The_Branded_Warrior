@@ -2,6 +2,7 @@
 
 Room::Room(int x, int y, int w, int h) : x(x), y(y), width(w), height(h) {}
 
+// cppcheck-suppress unusedFunction
 bool Room::intersects(const Room &other, int padding) const {
   return !(x - padding >= other.x + other.width ||
            x + width + padding <= other.x ||

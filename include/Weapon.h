@@ -15,8 +15,8 @@ private:
   int rollCritical() const;
 
 public:
-  Weapon(const std::string &name = "Fists", int damage = 2,
-         int durability = 100);
+  explicit Weapon(const std::string &name = "Fists", int damage = 2,
+                  int durability = 100);
 
   const std::string &getName() const { return name; }
   int getDamage() const { return damage; }

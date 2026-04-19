@@ -25,7 +25,9 @@ public:
 
   int getSize() const { return size; }
   int getCapacity() const { return capacity; }
+  // cppcheck-suppress unusedFunction
   bool isEmpty() const { return size == 0; }
+  // cppcheck-suppress unusedFunction
   bool isFull() const { return size >= capacity; }
 
   bool addWeapon(const Weapon &w);
