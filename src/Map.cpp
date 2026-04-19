@@ -260,15 +260,15 @@ sf::Color Map::getTileColor(int x, int y) const {
 }
 
 std::ostream &operator<<(std::ostream &os, const Map &map) {
-  for (int row = 0; row < map.getHeight(); ++row) {
-    for (int col = 0; col < map.getWidth(); ++col) {
-      os << map.getTile(col, row);
+  for (int row = 0; row < map.height; ++row) {
+    for (int col = 0; col < map.width; ++col) {
+      os << map.tiles[row][col];
     }
     os << '\n';
   }
-  os << "Rooms: " << map.getRooms().size();
-  for (size_t i = 0; i < map.getRooms().size(); ++i) {
-    os << "\n  " << (i + 1) << ". " << map.getRooms()[i];
+  os << "Rooms: " << map.rooms.size();
+  for (size_t i = 0; i < map.rooms.size(); ++i) {
+    os << "\n  " << (i + 1) << ". " << map.rooms[i];
   }
   return os;
 }

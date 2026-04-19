@@ -50,11 +50,12 @@ int Inventory::removeAllBroken() {
 }
 
 std::ostream &operator<<(std::ostream &os, const Inventory &inv) {
-  os << "Inventory[" << inv.getSize() << "/" << inv.getCapacity() << "]";
-  if (inv.getSize() > 0) {
+  int sz = static_cast<int>(inv.weapons.size());
+  os << "Inventory[" << sz << "/" << static_cast<int>(inv.weapons.capacity()) << "]";
+  if (sz > 0) {
     os << " {";
-    for (int i = 0; i < inv.getSize(); ++i) {
-      os << "\n    " << (i + 1) << ". " << inv.getWeapon(i);
+    for (int i = 0; i < sz; ++i) {
+      os << "\n    " << (i + 1) << ". " << inv.weapons[i];
     }
     os << "\n  }";
   } else {

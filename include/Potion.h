@@ -27,6 +27,8 @@ public:
   //           potiuni daca esti deja la sau peste maxHp
   // Lucky heal: 50% sansa de +3-5 HP bonus
   int consume(int currentHp, int maxHp) const;
+
+  friend std::ostream &operator<<(std::ostream &os, const Potion &p);
 };
 
 std::ostream &operator<<(std::ostream &os, const Potion &p);

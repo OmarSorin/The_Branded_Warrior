@@ -36,7 +36,7 @@ int Potion::consume(int currentHp, int maxHp) const {
 }
 
 std::ostream &operator<<(std::ostream &os, const Potion &p) {
-  os << "Potion[" << p.getName() << ", heal=" << p.getHealAmount()
-     << ", price=" << p.getPrice() << "]";
+  os << "Potion[" << p.name << ", heal=" << p.healAmount
+     << ", price=" << p.price << "]";
   return os;
 }

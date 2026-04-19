@@ -48,6 +48,8 @@ public:
   bool hasLineOfSight(int x1, int y1, int x2, int y2) const;
 
   sf::Color getTileColor(int x, int y) const;
+
+  friend std::ostream &operator<<(std::ostream &os, const Map &map);
 };
 
 std::ostream &operator<<(std::ostream &os, const Map &map);

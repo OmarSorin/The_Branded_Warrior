@@ -39,6 +39,8 @@ public:
 
   // sterge toate armele stricate
   int removeAllBroken();
+
+  friend std::ostream &operator<<(std::ostream &os, const Inventory &inv);
 };
 
 std::ostream &operator<<(std::ostream &os, const Inventory &inv);

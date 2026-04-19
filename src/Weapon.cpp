@@ -35,9 +35,9 @@ void Weapon::repair(int amount) {
 }
 
 std::ostream &operator<<(std::ostream &os, const Weapon &w) {
-  os << "Weapon[" << w.getName() << ", dmg=" << w.getDamage()
-     << ", dur=" << w.getDurability() << "/" << w.getMaxDurability();
-  if (w.isBroken()) {
+  os << "Weapon[" << w.name << ", dmg=" << w.damage
+     << ", dur=" << w.durability << "/" << w.maxDurability;
+  if (w.durability <= 0) {
     os << " (BROKEN)";
   }
   os << "]";

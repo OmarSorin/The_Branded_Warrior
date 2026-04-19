@@ -60,6 +60,8 @@ public:
 
   // Castiga XP si verifica level up, returneaza nr. de niveluri castigate
   int gainXp(int amount);
+
+  friend std::ostream &operator<<(std::ostream &os, const Character &c);
 };
 
 std::ostream &operator<<(std::ostream &os, const Character &c);

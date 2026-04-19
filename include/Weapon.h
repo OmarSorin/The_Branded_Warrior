@@ -28,6 +28,8 @@ public:
   int attack();
 
   void repair(int amount);
+
+  friend std::ostream &operator<<(std::ostream &os, const Weapon &w);
 };
 
 std::ostream &operator<<(std::ostream &os, const Weapon &w);

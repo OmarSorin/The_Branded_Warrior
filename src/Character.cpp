@@ -84,11 +84,11 @@ int Character::gainXp(int amount) {
 }
 
 std::ostream &operator<<(std::ostream &os, const Character &c) {
-  os << "=== " << c.getName() << " ===\n"
-     << "  Level: " << c.getLevel() << " (XP: " << c.getXp() << "/"
-     << c.getXpForNextLevel() << ")\n"
-     << "  HP: " << c.getHp() << "/" << c.getMaxHp() << "\n"
-     << "  Pos: (" << c.getX() << ", " << c.getY() << ")\n"
-     << "  " << c.getInventory();
+  os << "=== " << c.name << " ===\n"
+     << "  Level: " << c.level << " (XP: " << c.xp << "/"
+     << c.xpForNextLevel() << ")\n"
+     << "  HP: " << c.hp << "/" << c.maxHp << "\n"
+     << "  Pos: (" << c.posX << ", " << c.posY << ")\n"
+     << "  " << c.inventory;
   return os;
 }
