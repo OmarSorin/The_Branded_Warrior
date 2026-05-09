@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 
 #include <optional>
+#include <string>
 
 #include "Character.h"
 #include "GameDemo.h"
@@ -16,9 +17,9 @@ int main() {
   // === SFML WINDOW ===
   const int viewWidthTiles = 20;  // tiles shown horizontally
   const int viewHeightTiles = 15; // tiles shown vertically
+  // Window opens at 720p; the game view (320x240) is scaled up automatically.
   sf::RenderWindow window(
-      sf::VideoMode({static_cast<unsigned>(viewWidthTiles * tileSize),
-                     static_cast<unsigned>(viewHeightTiles * tileSize)}),
+      sf::VideoMode({1280u, 720u}),
       "The Branded Warrior");
   window.setFramerateLimit(60);
 
@@ -47,10 +48,10 @@ int main() {
   // Place 16x16 pixel PNG files in assets/tiles/.
   // If a file is missing the tile falls back to a flat color automatically.
   sf::Texture texFloor, texWall, texDoor, texObstacle;
-  const bool hasFloor    = texFloor.loadFromFile("assets/tiles/Tile_84.png");
-  // const bool hasWall     = texWall.loadFromFile("assets/tiles/Tile_03.png");
-  const bool hasDoor     = texDoor.loadFromFile("assets/tiles/Tile_45.png");
-  const bool hasObstacle = texObstacle.loadFromFile("assets/tiles/6.png");
+  const bool hasFloor    = texFloor.loadFromFile("assets/tiles/Tile_2.png");
+  // const bool hasWall     = texWall.loadFromFile("assets/tiles/Tile_3.png");
+  const bool hasDoor     = texDoor.loadFromFile("assets/tiles/Tile_1.png");
+  const bool hasObstacle = texObstacle.loadFromFile("assets/tiles/obstacle_3.png");
 
   // Helper: scale a sprite so it always fills exactly one tile,
   // regardless of the source image resolution.
@@ -71,6 +72,44 @@ int main() {
   // Fallback colored rectangle (used when a texture is not yet available)
   sf::RectangleShape tileShape(sf::Vector2f(
       static_cast<float>(tileSize), static_cast<float>(tileSize)));
+
+  // === HP HUD ===
+  sf::Font hudFont("C:/Windows/Fonts/arial.ttf");
+
+  const float hpBarMaxW = 200.f;
+  const float hpBarH    =  20.f;
+  const float hudPad    =   6.f;
+  const float hudX      =  16.f;
+  const float hudY      =  16.f;
+
+  sf::RectangleShape hpBg({hpBarMaxW + hudPad * 2, hpBarH + hudPad * 2});
+  hpBg.setFillColor(sf::Color(0, 0, 0, 180));
+  hpBg.setOutlineColor(sf::Color(160, 30, 30));
+  hpBg.setOutlineThickness(2.f);
+  hpBg.setPosition({hudX, hudY});
+
+  sf::RectangleShape hpBar({hpBarMaxW, hpBarH});
+  hpBar.setFillColor(sf::Color(200, 30, 30));
+  hpBar.setPosition({hudX + hudPad, hudY + hudPad});
+
+  sf::Text hpText(hudFont, "", 20);
+  hpText.setFillColor(sf::Color::White);
+
+  // === XP HUD ===
+  const float xpBarY = hudY + hpBarH + hudPad * 2 + 4.f; // just below HP bar
+
+  sf::RectangleShape xpBg({hpBarMaxW + hudPad * 2, hpBarH + hudPad * 2});
+  xpBg.setFillColor(sf::Color(0, 0, 0, 180));
+  xpBg.setOutlineColor(sf::Color(30, 80, 160));
+  xpBg.setOutlineThickness(2.f);
+  xpBg.setPosition({hudX, xpBarY});
+
+  sf::RectangleShape xpBar({0.f, hpBarH});
+  xpBar.setFillColor(sf::Color(50, 120, 220));
+  xpBar.setPosition({hudX + hudPad, xpBarY + hudPad});
+
+  sf::Text xpText(hudFont, "", 20);
+  xpText.setFillColor(sf::Color::White);
 
   // === CAMERA ===
   sf::View camera(sf::FloatRect(
@@ -165,6 +204,38 @@ int main() {
 
     // Draw player on top
     window.draw(playerSprite);
+
+    // ── Draw HP HUD (screen-space) ────────────────────────────────────────
+    window.setView(window.getDefaultView());
+
+    float hpRatio = static_cast<float>(hero.getHp())
+                  / static_cast<float>(hero.getMaxHp());
+    if (hpRatio < 0.f) hpRatio = 0.f;
+    hpBar.setSize({hpBarMaxW * hpRatio, hpBarH});
+
+    hpText.setString(std::to_string(hero.getHp()) + "/" + std::to_string(hero.getMaxHp()));
+    hpText.setPosition({hudX + hpBarMaxW + hudPad * 2 + 6.f, hudY});
+
+    window.draw(hpBg);
+    window.draw(hpBar);
+    window.draw(hpText);
+
+    // XP bar
+    float xpRatio = static_cast<float>(hero.getXp())
+                  / static_cast<float>(hero.getXpForNextLevel());
+    if (xpRatio < 0.f) xpRatio = 0.f;
+    if (xpRatio > 1.f) xpRatio = 1.f;
+    xpBar.setSize({hpBarMaxW * xpRatio, hpBarH});
+
+    xpText.setString("Lv" + std::to_string(hero.getLevel()) + "  "
+                     + std::to_string(hero.getXp()) + "/" + std::to_string(hero.getXpForNextLevel()));
+    xpText.setPosition({hudX + hpBarMaxW + hudPad * 2 + 6.f, xpBarY});
+
+    window.draw(xpBg);
+    window.draw(xpBar);
+    window.draw(xpText);
+
+    window.setView(camera);
     window.display();
   }
 
