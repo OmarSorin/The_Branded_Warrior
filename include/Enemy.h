@@ -24,7 +24,7 @@ protected:
     bool aggro          = false; // true once enemy has spotted the hero
 
     // Available to derived classes for healing (e.g. Troll regen)
-    void healHp(int amount);
+    virtual void healHp(int amount);
 
     // NVI: derived classes implement this
     virtual void doDisplay(std::ostream& os) const = 0;
