@@ -71,6 +71,11 @@ target_sources(${MAIN_EXECUTABLE_NAME}
         src/Room.cpp
         src/Map.cpp
         src/GameDemo.cpp
+        src/Enemy.cpp
+        src/Goblin.cpp
+        src/Orc.cpp
+        src/Troll.cpp
+        src/Pathfinding.cpp
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

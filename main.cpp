@@ -1,11 +1,16 @@
 #include <SFML/Graphics.hpp>
 
+#include <algorithm>
+#include <memory>
 #include <optional>
 #include <string>
 
 #include "Character.h"
 #include "GameDemo.h"
+#include "Goblin.h"
 #include "Map.h"
+#include "Orc.h"
+#include "Troll.h"
 #include "Weapon.h"
 
 int main() {
@@ -27,6 +32,26 @@ int main() {
   Character hero("Aldric", 120, 1, Weapon("Iron Sword", 15, 10));
   auto [spawnX, spawnY] = dungeon.getRandomFloorTile();
   hero.setPosition(spawnX, spawnY);
+
+  // === ENEMY SPAWNING ===
+  std::vector<std::unique_ptr<Enemy>> enemies;
+  {
+    auto spawnEnemy = [&](std::unique_ptr<Enemy> e) {
+      auto [ex, ey] = dungeon.getRandomFloorTile();
+      while (ex == spawnX && ey == spawnY) {
+        auto [nx, ny] = dungeon.getRandomFloorTile();
+        ex = nx; ey = ny;
+      }
+      e->setPosition(ex, ey);
+      enemies.push_back(std::move(e));
+    };
+    spawnEnemy(std::make_unique<Goblin>("Goblin"));
+    spawnEnemy(std::make_unique<Goblin>("Goblin 2"));
+    spawnEnemy(std::make_unique<Goblin>("Goblin 3"));
+    spawnEnemy(std::make_unique<Orc>("Orc"));
+    spawnEnemy(std::make_unique<Orc>("Orc 2"));
+    spawnEnemy(std::make_unique<Troll>("Troll"));
+  }
 
   // === PLAYER SPRITES ===
   sf::Texture texRight("assets/guts-right.png");
@@ -134,6 +159,10 @@ int main() {
   };
   updateCamera();
 
+  // Enemy rendering shape (color varies by type)
+  sf::RectangleShape enemyShape(sf::Vector2f(
+      static_cast<float>(tileSize), static_cast<float>(tileSize)));
+
   // === GAME LOOP ===
   while (window.isOpen()) {
     // 1. POLL EVENTS
@@ -159,13 +188,36 @@ int main() {
         if (dx != 0 || dy != 0) {
           int newX = hero.getX() + dx;
           int newY = hero.getY() + dy;
-          if (dungeon.isWalkable(newX, newY)) {
+
+          // Bump into enemy = attack it
+          auto it = std::find_if(enemies.begin(), enemies.end(),
+              [&](const std::unique_ptr<Enemy>& e) {
+                return e->isAlive() && e->getX() == newX && e->getY() == newY;
+              });
+
+          if (it != enemies.end()) {
+            int dmg = hero.getEquippedWeapon().attack();
+            bool died = (*it)->takeDamage(dmg);
+            if (died) {
+              (*it)->onDeath(hero);
+              enemies.erase(it);
+            }
+          } else if (dungeon.isWalkable(newX, newY)) {
             hero.setPosition(newX, newY);
             playerSprite.setPosition(
                 {static_cast<float>(newX * tileSize),
                  static_cast<float>(newY * tileSize)});
             updateCamera();
           }
+
+          // Enemy turn — each enemy acts once after the player
+          for (auto& e : enemies) {
+            e->updateAI(hero, dungeon);
+          }
+          enemies.erase(
+              std::remove_if(enemies.begin(), enemies.end(),
+                  [](const std::unique_ptr<Enemy>& e) { return !e->isAlive(); }),
+              enemies.end());
         }
       }
     }
@@ -200,6 +252,19 @@ int main() {
           window.draw(tileShape);
         }
       }
+    }
+
+    // Draw enemies
+    for (const auto& e : enemies) {
+      if (!e->isAlive()) continue;
+      sf::Color col;
+      if      (dynamic_cast<Troll*>(e.get())) col = sf::Color(140,  80, 200);
+      else if (dynamic_cast<Orc*>  (e.get())) col = sf::Color(200,  60,  40);
+      else                                     col = sf::Color( 40, 180,  40);
+      enemyShape.setFillColor(col);
+      enemyShape.setPosition({static_cast<float>(e->getX() * tileSize),
+                               static_cast<float>(e->getY() * tileSize)});
+      window.draw(enemyShape);
     }
 
     // Draw player on top
