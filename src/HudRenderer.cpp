@@ -1,0 +1,146 @@
+#include "HudRenderer.h"
+#include <string>
+
+HudRenderer::HudRenderer(const sf::Font& font)
+    : hpText(font),
+      xpText(font),
+      potLabelSmall(font),
+      potLabelMed(font),
+      potLabelLarge(font),
+      deathTitle(font),
+      deathSub(font) {
+    // ── HP bar setup ────────────────────────────────────────────────────────
+    hpBg.setSize({HP_BAR_MAX_W + HUD_PAD * 2, BAR_H + HUD_PAD * 2});
+    hpBg.setFillColor(sf::Color(0, 0, 0, 180));
+    hpBg.setOutlineColor(sf::Color(160, 30, 30));
+    hpBg.setOutlineThickness(2.f);
+    hpBg.setPosition({HUD_X, HUD_Y});
+
+    hpBar.setFillColor(sf::Color(200, 30, 30));
+    hpBar.setPosition({HUD_X + HUD_PAD, HUD_Y + HUD_PAD});
+
+    hpBar.setPosition({HUD_X + HUD_PAD, HUD_Y + HUD_PAD});
+    hpText.setCharacterSize(20);
+    hpText.setFillColor(sf::Color::White);
+
+    // ── XP bar setup ────────────────────────────────────────────────────────
+    xpBg.setSize({HP_BAR_MAX_W + HUD_PAD * 2, BAR_H + HUD_PAD * 2});
+    xpBg.setFillColor(sf::Color(0, 0, 0, 180));
+    xpBg.setOutlineColor(sf::Color(30, 80, 160));
+    xpBg.setOutlineThickness(2.f);
+    xpBg.setPosition({HUD_X, XP_BAR_Y});
+
+    xpBar.setFillColor(sf::Color(50, 120, 220));
+    xpBar.setPosition({HUD_X + HUD_PAD, XP_BAR_Y + HUD_PAD});
+    xpText.setCharacterSize(20);
+    xpText.setFillColor(sf::Color::White);
+
+    // ── Potion panel setup ──────────────────────────────────────────────────
+    potBg.setSize({POT_PANEL_W, POT_ROW_H * 3 + 8.f});
+    potBg.setFillColor(sf::Color(0, 0, 0, 160));
+    potBg.setOutlineColor(sf::Color(100, 80, 40));
+    potBg.setOutlineThickness(1.5f);
+    potBg.setPosition({POT_HUD_X - 4.f, POT_HUD_Y - 4.f});
+
+    flaskSmall.setSize({POT_ICON_W, POT_ICON_H});
+    flaskSmall.setFillColor(sf::Color(50, 200, 80));
+    
+    flaskMed.setSize({POT_ICON_W, POT_ICON_H});
+    flaskMed.setFillColor(sf::Color(50, 120, 220));
+    
+    flaskLarge.setSize({POT_ICON_W, POT_ICON_H});
+    flaskLarge.setFillColor(sf::Color(180, 60, 220));
+
+    potLabelSmall.setCharacterSize(16);
+    potLabelSmall.setFillColor(sf::Color(180, 255, 180));
+
+    potLabelMed.setCharacterSize(16);
+    potLabelMed.setFillColor(sf::Color(150, 190, 255));
+
+    potLabelLarge.setCharacterSize(16);
+    potLabelLarge.setFillColor(sf::Color(220, 160, 255));
+
+    // ── YOU DIED overlay setup ──────────────────────────────────────────────
+    deathOverlay.setSize({1280.f, 720.f});
+    deathOverlay.setFillColor(sf::Color(0, 0, 0, 180));
+    deathTitle.setString("YOU DIED");
+    deathTitle.setCharacterSize(96);
+    deathTitle.setFillColor(sf::Color(180, 20, 20));
+    deathTitle.setStyle(sf::Text::Bold);
+    auto dtBounds = deathTitle.getLocalBounds();
+    deathTitle.setOrigin({dtBounds.position.x + dtBounds.size.x / 2.f,
+                          dtBounds.position.y + dtBounds.size.y / 2.f});
+    deathTitle.setPosition({640.f, 310.f});
+    deathSub.setString("Press ESC to quit");
+    deathSub.setCharacterSize(28);
+    deathSub.setFillColor(sf::Color(200, 200, 200));
+    auto dsBounds = deathSub.getLocalBounds();
+    deathSub.setOrigin({dsBounds.position.x + dsBounds.size.x / 2.f,
+                        dsBounds.position.y + dsBounds.size.y / 2.f});
+    deathSub.setPosition({640.f, 420.f});
+}
+
+void HudRenderer::draw(sf::RenderWindow& window,
+                       const Character&  hero,
+                       int smallPotions,
+                       int medPotions,
+                       int largePotions,
+                       bool gameOver) {
+    // Reset to screen-space view for HUD rendering
+    window.setView(window.getDefaultView());
+
+    // ── Draw HP bar ─────────────────────────────────────────────────────────
+    float hpRatio = static_cast<float>(hero.getHp()) / static_cast<float>(hero.getMaxHp());
+    if (hpRatio < 0.f) hpRatio = 0.f;
+    hpBar.setSize({HP_BAR_MAX_W * hpRatio, BAR_H});
+
+    hpText.setString(std::to_string(hero.getHp()) + "/" + std::to_string(hero.getMaxHp()));
+    hpText.setPosition({HUD_X + HP_BAR_MAX_W + HUD_PAD * 2 + 6.f, HUD_Y});
+
+    window.draw(hpBg);
+    window.draw(hpBar);
+    window.draw(hpText);
+
+    // ── Draw XP bar ─────────────────────────────────────────────────────────
+    float xpRatio = static_cast<float>(hero.getXp()) / static_cast<float>(hero.getXpForNextLevel());
+    if (xpRatio < 0.f) xpRatio = 0.f;
+    if (xpRatio > 1.f) xpRatio = 1.f;
+    xpBar.setSize({HP_BAR_MAX_W * xpRatio, BAR_H});
+
+    xpText.setString("Lv" + std::to_string(hero.getLevel()) + "  "
+                     + std::to_string(hero.getXp()) + "/" + std::to_string(hero.getXpForNextLevel()));
+    xpText.setPosition({HUD_X + HP_BAR_MAX_W + HUD_PAD * 2 + 6.f, XP_BAR_Y});
+
+    window.draw(xpBg);
+    window.draw(xpBar);
+    window.draw(xpText);
+
+    // ── Draw Potion Panel ───────────────────────────────────────────────────
+    window.draw(potBg);
+    const float textOffX = POT_ICON_W + 6.f;
+
+    flaskSmall.setPosition({POT_HUD_X, POT_HUD_Y});
+    potLabelSmall.setString("[U] x" + std::to_string(smallPotions) + "  +25");
+    potLabelSmall.setPosition({POT_HUD_X + textOffX, POT_HUD_Y});
+    window.draw(flaskSmall);
+    window.draw(potLabelSmall);
+
+    flaskMed.setPosition({POT_HUD_X, POT_HUD_Y + POT_ROW_H});
+    potLabelMed.setString("[I] x" + std::to_string(medPotions) + "  +50");
+    potLabelMed.setPosition({POT_HUD_X + textOffX, POT_HUD_Y + POT_ROW_H});
+    window.draw(flaskMed);
+    window.draw(potLabelMed);
+
+    flaskLarge.setPosition({POT_HUD_X, POT_HUD_Y + POT_ROW_H * 2});
+    potLabelLarge.setString("[O] x" + std::to_string(largePotions) + "  +100");
+    potLabelLarge.setPosition({POT_HUD_X + textOffX, POT_HUD_Y + POT_ROW_H * 2});
+    window.draw(flaskLarge);
+    window.draw(potLabelLarge);
+
+    // ── Draw YOU DIED overlay ───────────────────────────────────────────────
+    if (gameOver) {
+        window.draw(deathOverlay);
+        window.draw(deathTitle);
+        window.draw(deathSub);
+    }
+}

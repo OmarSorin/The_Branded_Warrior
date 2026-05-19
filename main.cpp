@@ -10,6 +10,7 @@
 #include "Character.h"
 #include "GameDemo.h"
 #include "Goblin.h"
+#include "HudRenderer.h"
 #include "Map.h"
 #include "Orc.h"
 #include "Troll.h"
@@ -100,43 +101,9 @@ int main() {
   sf::RectangleShape tileShape(sf::Vector2f(
       static_cast<float>(tileSize), static_cast<float>(tileSize)));
 
-  // === HP HUD ===
+  // === HUD SETUP ===
   sf::Font hudFont("C:/Windows/Fonts/arial.ttf");
-
-  const float hpBarMaxW = 200.f;
-  const float hpBarH    =  20.f;
-  const float hudPad    =   6.f;
-  const float hudX      =  16.f;
-  const float hudY      =  16.f;
-
-  sf::RectangleShape hpBg({hpBarMaxW + hudPad * 2, hpBarH + hudPad * 2});
-  hpBg.setFillColor(sf::Color(0, 0, 0, 180));
-  hpBg.setOutlineColor(sf::Color(160, 30, 30));
-  hpBg.setOutlineThickness(2.f);
-  hpBg.setPosition({hudX, hudY});
-
-  sf::RectangleShape hpBar({hpBarMaxW, hpBarH});
-  hpBar.setFillColor(sf::Color(200, 30, 30));
-  hpBar.setPosition({hudX + hudPad, hudY + hudPad});
-
-  sf::Text hpText(hudFont, "", 20);
-  hpText.setFillColor(sf::Color::White);
-
-  // === XP HUD ===
-  const float xpBarY = hudY + hpBarH + hudPad * 2 + 4.f; // just below HP bar
-
-  sf::RectangleShape xpBg({hpBarMaxW + hudPad * 2, hpBarH + hudPad * 2});
-  xpBg.setFillColor(sf::Color(0, 0, 0, 180));
-  xpBg.setOutlineColor(sf::Color(30, 80, 160));
-  xpBg.setOutlineThickness(2.f);
-  xpBg.setPosition({hudX, xpBarY});
-
-  sf::RectangleShape xpBar({0.f, hpBarH});
-  xpBar.setFillColor(sf::Color(50, 120, 220));
-  xpBar.setPosition({hudX + hudPad, xpBarY + hudPad});
-
-  sf::Text xpText(hudFont, "", 20);
-  xpText.setFillColor(sf::Color::White);
+  HudRenderer hudRenderer(hudFont);
 
   // === CAMERA ===
   sf::View camera(sf::FloatRect(
@@ -174,57 +141,8 @@ int main() {
   const Potion potMed  ("Medium Potion", 50);
   const Potion potLarge("Large Potion", 100);
 
-  // === POTION HUD (upper-right) ===
-  const float potHudRightMargin = 16.f;
-  const float potHudY           = 16.f;
-  const float potIconW          = 14.f;
-  const float potIconH          = 20.f;
-  const float potRowH           = 30.f;
-  const float potTextOffX       = potIconW + 6.f;
-
-  // Background panel
-  sf::RectangleShape potBg({120.f, potRowH * 3 + 8.f});
-  potBg.setFillColor(sf::Color(0, 0, 0, 160));
-  potBg.setOutlineColor(sf::Color(100, 80, 40));
-  potBg.setOutlineThickness(1.5f);
-
-  // Flask icons  (green / blue / purple)
-  sf::RectangleShape flaskSmall({potIconW, potIconH});
-  flaskSmall.setFillColor(sf::Color(50, 200, 80));
-  sf::RectangleShape flaskMed({potIconW, potIconH});
-  flaskMed.setFillColor(sf::Color(50, 120, 220));
-  sf::RectangleShape flaskLarge({potIconW, potIconH});
-  flaskLarge.setFillColor(sf::Color(180, 60, 220));
-
-  // Count + key labels
-  sf::Text potLabelSmall(hudFont, "", 16);
-  potLabelSmall.setFillColor(sf::Color(180, 255, 180));
-  sf::Text potLabelMed(hudFont, "", 16);
-  potLabelMed.setFillColor(sf::Color(150, 190, 255));
-  sf::Text potLabelLarge(hudFont, "", 16);
-  potLabelLarge.setFillColor(sf::Color(220, 160, 255));
-
   // === GAME LOOP ===
   bool gameOver = false;
-
-  // "YOU DIED" overlay elements
-  sf::RectangleShape deathOverlay({1280.f, 720.f});
-  deathOverlay.setFillColor(sf::Color(0, 0, 0, 180));
-
-  sf::Text deathTitle(hudFont, "YOU DIED", 96);
-  deathTitle.setFillColor(sf::Color(180, 20, 20));
-  deathTitle.setStyle(sf::Text::Bold);
-  auto dtBounds = deathTitle.getLocalBounds();
-  deathTitle.setOrigin({dtBounds.position.x + dtBounds.size.x / 2.f,
-                        dtBounds.position.y + dtBounds.size.y / 2.f});
-  deathTitle.setPosition({640.f, 310.f});
-
-  sf::Text deathSub(hudFont, "Press ESC to quit", 28);
-  deathSub.setFillColor(sf::Color(200, 200, 200));
-  auto dsBounds = deathSub.getLocalBounds();
-  deathSub.setOrigin({dsBounds.position.x + dsBounds.size.x / 2.f,
-                      dsBounds.position.y + dsBounds.size.y / 2.f});
-  deathSub.setPosition({640.f, 420.f});
 
   while (window.isOpen()) {
     // 1. POLL EVENTS
@@ -374,71 +292,8 @@ int main() {
     // Draw player on top
     window.draw(playerSprite);
 
-    // ── Draw HP HUD (screen-space) ────────────────────────────────────────
-    window.setView(window.getDefaultView());
-
-    float hpRatio = static_cast<float>(hero.getHp())
-                  / static_cast<float>(hero.getMaxHp());
-    if (hpRatio < 0.f) hpRatio = 0.f;
-    hpBar.setSize({hpBarMaxW * hpRatio, hpBarH});
-
-    hpText.setString(std::to_string(hero.getHp()) + "/" + std::to_string(hero.getMaxHp()));
-    hpText.setPosition({hudX + hpBarMaxW + hudPad * 2 + 6.f, hudY});
-
-    window.draw(hpBg);
-    window.draw(hpBar);
-    window.draw(hpText);
-
-    // XP bar
-    float xpRatio = static_cast<float>(hero.getXp())
-                  / static_cast<float>(hero.getXpForNextLevel());
-    if (xpRatio < 0.f) xpRatio = 0.f;
-    if (xpRatio > 1.f) xpRatio = 1.f;
-    xpBar.setSize({hpBarMaxW * xpRatio, hpBarH});
-
-    xpText.setString("Lv" + std::to_string(hero.getLevel()) + "  "
-                     + std::to_string(hero.getXp()) + "/" + std::to_string(hero.getXpForNextLevel()));
-    xpText.setPosition({hudX + hpBarMaxW + hudPad * 2 + 6.f, xpBarY});
-
-    window.draw(xpBg);
-    window.draw(xpBar);
-    window.draw(xpText);
-
-    // ── Potion HUD (upper right) ──────────────────────────────────────────
-    {
-      const float panelW = 120.f;
-      const float panelX = 1280.f - panelW - potHudRightMargin;
-      potBg.setPosition({panelX - 4.f, potHudY - 4.f});
-      window.draw(potBg);
-
-      // Small (green) — U
-      flaskSmall.setPosition({panelX, potHudY});
-      potLabelSmall.setString("[U] x" + std::to_string(smallPotions) + "  +25");
-      potLabelSmall.setPosition({panelX + potTextOffX, potHudY});
-      window.draw(flaskSmall);
-      window.draw(potLabelSmall);
-
-      // Medium (blue) — I
-      flaskMed.setPosition({panelX, potHudY + potRowH});
-      potLabelMed.setString("[I] x" + std::to_string(medPotions) + "  +50");
-      potLabelMed.setPosition({panelX + potTextOffX, potHudY + potRowH});
-      window.draw(flaskMed);
-      window.draw(potLabelMed);
-
-      // Large (purple) — O
-      flaskLarge.setPosition({panelX, potHudY + potRowH * 2});
-      potLabelLarge.setString("[O] x" + std::to_string(largePotions) + "  +100");
-      potLabelLarge.setPosition({panelX + potTextOffX, potHudY + potRowH * 2});
-      window.draw(flaskLarge);
-      window.draw(potLabelLarge);
-    }
-
-    // ── YOU DIED overlay ─────────────────────────────────────────────────
-    if (gameOver) {
-      window.draw(deathOverlay);
-      window.draw(deathTitle);
-      window.draw(deathSub);
-    }
+    // ── Draw HUD ──────────────────────────────────────────────────────────
+    hudRenderer.draw(window, hero, smallPotions, medPotions, largePotions, gameOver);
 
     window.setView(camera);
     window.display();

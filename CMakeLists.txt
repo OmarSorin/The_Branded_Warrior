@@ -76,6 +76,7 @@ target_sources(${MAIN_EXECUTABLE_NAME}
         src/Orc.cpp
         src/Troll.cpp
         src/Pathfinding.cpp
+        src/HudRenderer.cpp
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
