@@ -63,7 +63,7 @@ public:
     // Returns true if the enemy died
     bool takeDamage(int amount);
 
-    // static int getTotalEnemiesCreated() { return totalEnemiesCreated; }
+    // static int getTotalEnemiesCreated() { return totalEnemiesCreated; } decomentata dupa ce se foloseste
 
     friend std::ostream& operator<<(std::ostream& os, const Enemy& e);
 };
