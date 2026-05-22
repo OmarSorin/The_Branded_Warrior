@@ -31,8 +31,8 @@ void Hobbit::doDisplay(std::ostream& os) const {
 }
 
 void Hobbit::updateAI(Character& hero, const Map& dungeon) {
-    int dx = hero.getX() - posX;
-    int dy = hero.getY() - posY;
+    int dx = hero.getX() - getX();
+    int dy = hero.getY() - getY();
     int dist = std::abs(dx) + std::abs(dy);
 
     // Attack if adjacent
@@ -42,10 +42,10 @@ void Hobbit::updateAI(Character& hero, const Map& dungeon) {
     }
 
     // Move closer using simple step
-    int stepX = posX + (dx != 0 ? (dx > 0 ? 1 : -1) : 0);
-    int stepY = posY + (dy != 0 ? (dy > 0 ? 1 : -1) : 0);
-    if (dungeon.isWalkable(stepX, posY))
-        posX = stepX;
-    else if (dungeon.isWalkable(posX, stepY))
-        posY = stepY;
+    int stepX = getX() + (dx != 0 ? (dx > 0 ? 1 : -1) : 0);
+    int stepY = getY() + (dy != 0 ? (dy > 0 ? 1 : -1) : 0);
+    if (dungeon.isWalkable(stepX, getY()))
+        setPosition(stepX, getY());
+    else if (dungeon.isWalkable(getX(), stepY))
+        setPosition(getX(), stepY);
 }
