@@ -52,6 +52,7 @@ bool EnemyManager::handlePlayerAttack(int newX, int newY, Character& hero,
             if      (dropsSmall) ++smallPotions;
             else if (dropsMed)   ++medPotions;
             else if (dropsLarge) ++largePotions;
+            else                   ++medPotions;
         }
         return true; // Attack occurred
     }
@@ -88,7 +89,8 @@ void EnemyManager::draw(sf::RenderWindow& window) {
         sf::Color col;
         if      (dynamic_cast<Troll*>(e.get())) col = sf::Color(140,  80, 200);
         else if (dynamic_cast<Orc*>  (e.get())) col = sf::Color(200,  60,  40);
-        else                                     col = sf::Color( 40, 180,  40);
+        else if (dynamic_cast<Goblin*>(e.get())) col = sf::Color( 40, 180,  40);
+        else                                     col = sf::Color(220,  220,  180);
         
         enemyShape.setFillColor(col);
         enemyShape.setPosition({static_cast<float>(e->getX() * tileSize),
@@ -109,3 +111,4 @@ EnemyManager& EnemyManager::operator=(EnemyManager other) {
     std::swap(enemyShape, other.enemyShape);
     return *this;
 }
+
