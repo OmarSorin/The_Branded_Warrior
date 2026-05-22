@@ -19,7 +19,7 @@ void EnemyManager::spawnInitialEnemies(const Map& dungeon, int spawnX, int spawn
         }
         e->setPosition(ex, ey);
         enemies.push_back(std::move(e));
-        std::cerr << "Total enemies created: " << Enemy::getTotalEnemiesCreated() << "\n";
+
     };
 
     spawnEnemy(std::make_unique<Goblin>("Goblin"));
@@ -29,6 +29,7 @@ void EnemyManager::spawnInitialEnemies(const Map& dungeon, int spawnX, int spawn
     spawnEnemy(std::make_unique<Orc>("Orc 2"));
     spawnEnemy(std::make_unique<Troll>("Troll"));
     spawnEnemy(std::make_unique<Hobbit>("Hobbit"));
+    std::cerr << "Total enemies created: " << Enemy::getTotalEnemiesCreated() << "\n";
 }
 
 bool EnemyManager::handlePlayerAttack(int newX, int newY, Character& hero, 
