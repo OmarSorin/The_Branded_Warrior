@@ -18,6 +18,7 @@ void EnemyManager::spawnInitialEnemies(const Map& dungeon, int spawnX, int spawn
         }
         e->setPosition(ex, ey);
         enemies.push_back(std::move(e));
+        std::cerr << "Total enemies created: " << Enemy::getTotalEnemiesCreated() << "\n";
     };
 
     spawnEnemy(std::make_unique<Goblin>("Goblin"));
