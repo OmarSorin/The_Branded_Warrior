@@ -6,7 +6,8 @@ GameEngine::GameEngine()
       camera(),
       hudFont(),
       dungeon(50, 37),
-      hero("Aldric", 120, 1, Weapon("Iron Sword", 15, 10)),
+      hero("Aldric", 120, 1, Weapon("Iron Sword", 15, 999)),
+        // hero("Aldric", 120, 1, Weapon("Iron Sword", 1000, 10)), //godmode
       gameOver(false),
       mapRenderer(TILE_SIZE),
       enemyManager(TILE_SIZE),

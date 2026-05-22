@@ -25,7 +25,7 @@ int Orc::computeAttackDamage() const {
 }
 
 void Orc::onDeath(Character& killer) {
-    killer.gainXp(50);
+    killer.gainXp(70);
 }
 
 void Orc::doDisplay(std::ostream& os) const {

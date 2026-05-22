@@ -23,7 +23,7 @@ int Troll::computeAttackDamage() const {
 }
 
 void Troll::onDeath(Character& killer) {
-    killer.gainXp(80);
+    killer.gainXp(100);
 }
 
 void Troll::regenerate() {

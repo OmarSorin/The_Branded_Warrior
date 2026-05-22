@@ -18,7 +18,7 @@ int Goblin::computeAttackDamage() const {
 }
 
 void Goblin::onDeath(Character& killer) {
-    killer.gainXp(20);
+    killer.gainXp(40);
 }
 
 void Goblin::doDisplay(std::ostream& os) const {

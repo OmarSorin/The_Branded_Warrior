@@ -1,6 +1,6 @@
 #include "Character.h"
 
-int Character::xpForNextLevel() const { return level * 50 + 50; }
+int Character::xpForNextLevel() const { return level * 50; }
 
 int Character::checkLevelUp() {
   int levelsGained = 0;
@@ -10,7 +10,11 @@ int Character::checkLevelUp() {
     int hpBoost = 10 + level * 2;
     maxHp += hpBoost;
     hp += hpBoost;
+    // int newDamage = 15 + (level - 1) * 10; // 15, 25, 35, 45...
+    int newDamage=1000;
+    inventory.addWeapon(Weapon("Blade Lv." + std::to_string(level), newDamage, 999));
     ++levelsGained;
+
   }
   return levelsGained;
 }
@@ -41,7 +45,7 @@ int Character::attackTarget(Character &target) {
     return 0;
   }
 
-  int dealt = inventory.getWeapon(0).attack();
+  int dealt = inventory.getWeapon(inventory.findStrongestIndex()).attack();;
   if (dealt == 0) {
     return 0;
   }
