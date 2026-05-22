@@ -2,6 +2,7 @@
 #include "Goblin.h"
 #include "Orc.h"
 #include "Troll.h"
+#include "Hobbit.h"
 #include <algorithm>
 
 EnemyManager::EnemyManager(int tileSize) : tileSize(tileSize) {
@@ -25,6 +26,7 @@ void EnemyManager::spawnInitialEnemies(const Map& dungeon, int spawnX, int spawn
     spawnEnemy(std::make_unique<Orc>("Orc"));
     spawnEnemy(std::make_unique<Orc>("Orc 2"));
     spawnEnemy(std::make_unique<Troll>("Troll"));
+    spawnEnemy(std::make_unique<Hobbit>("Hobbit"));
 }
 
 bool EnemyManager::handlePlayerAttack(int newX, int newY, Character& hero, 
