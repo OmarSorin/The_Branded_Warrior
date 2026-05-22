@@ -4,6 +4,7 @@
 #include "Troll.h"
 #include "Hobbit.h"
 #include <algorithm>
+#include <iostream>
 
 EnemyManager::EnemyManager(int tileSize) : tileSize(tileSize) {
     enemyShape.setSize(sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize)));
