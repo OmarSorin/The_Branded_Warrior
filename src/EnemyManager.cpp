@@ -96,3 +96,16 @@ void EnemyManager::draw(sf::RenderWindow& window) {
         window.draw(enemyShape);
     }
 }
+
+EnemyManager::EnemyManager(const EnemyManager& other)
+    : tileSize(other.tileSize), enemyShape(other.enemyShape) {
+    for (const auto& e : other.enemies)
+        enemies.push_back(e->clone());
+}
+
+EnemyManager& EnemyManager::operator=(EnemyManager other) {
+    std::swap(enemies, other.enemies);
+    std::swap(tileSize, other.tileSize);
+    std::swap(enemyShape, other.enemyShape);
+    return *this;
+}

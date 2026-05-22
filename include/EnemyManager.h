@@ -29,6 +29,9 @@ public:
     void takeTurns(Character& hero, const Map& dungeon);
 
     void draw(sf::RenderWindow& window);
+
+    EnemyManager(const EnemyManager& other);
+    EnemyManager& operator=(EnemyManager other);
 };
 
 #endif // ENEMYMANAGER_H
