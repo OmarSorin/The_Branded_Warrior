@@ -10,8 +10,8 @@ int Character::checkLevelUp() {
     int hpBoost = 10 + level * 2;
     maxHp += hpBoost;
     hp += hpBoost;
-    // int newDamage = 15 + (level - 1) * 10; // 15, 25, 35, 45...
-    int newDamage=1000;
+    int newDamage = 15 + (level - 1) * 10; // 15, 25, 35, 45...
+    // int newDamage=1000; // for weapon testing
     inventory.addWeapon(Weapon("Blade Lv." + std::to_string(level), newDamage, 999));
     ++levelsGained;
 

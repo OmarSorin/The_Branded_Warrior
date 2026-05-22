@@ -43,8 +43,8 @@ public:
   int getXpForNextLevel() const { return xpForNextLevel(); }
   bool isAlive() const { return hp > 0; }
 
-  const Weapon &getEquippedWeapon() const { return inventory.getWeapon(0); }
-  Weapon       &getEquippedWeapon()       { return inventory.getWeapon(0); }
+    const Weapon &getEquippedWeapon() const { return inventory.getWeapon(inventory.findStrongestIndex()); }
+    Weapon       &getEquippedWeapon()       { return inventory.getWeapon(inventory.findStrongestIndex()); }
 
   // cppcheck-suppress unusedFunction
   const Inventory &getInventory() const { return inventory; }
