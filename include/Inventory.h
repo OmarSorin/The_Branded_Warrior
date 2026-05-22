@@ -32,6 +32,10 @@ public:
   const Weapon &getWeapon(int index) const { return weapons[index]; }
 
   // Acces la o arma (non-const, necesar pentru attack care modifica durability)
+  // ulterior am renuntat la reparari dar codul pe viitor este aici, foarte usor expandabil
+  // nu adauga mult la procentaj 0.1% MAXIM deci las asa
+  // ca sa fie balansat ar trebui implementate diferite lucruri ca sa aiba efectiv sens in jos adica
+  // token-uri pentru reparatii, interfata inventar si asa mai departe, poate fac vara dupa predare ca sa fie mai frumos
   Weapon &getWeapon(int index) { return weapons[index]; }
 
   // cauta arma principala (cea mai puternica)

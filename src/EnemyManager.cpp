@@ -98,7 +98,7 @@ void EnemyManager::draw(sf::RenderWindow& window) {
 }
 
 EnemyManager::EnemyManager(const EnemyManager& other)
-    : tileSize(other.tileSize), enemyShape(other.enemyShape) {
+    : enemyShape(other.enemyShape), tileSize(other.tileSize) {
     for (const auto& e : other.enemies)
         enemies.push_back(e->clone());
 }
