@@ -18,6 +18,7 @@ public:
     void updateAI(Character& hero, const Map& dungeon) override;
 
     static int getTotalLuckyHits() { return totalLuckyHits; }
+    bool hasLandedLuckyHit() const { return totalLuckyHits > 0; }
 };
 
 #endif // HOBBIT_H

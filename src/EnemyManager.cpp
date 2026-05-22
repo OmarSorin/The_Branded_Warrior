@@ -49,6 +49,11 @@ bool EnemyManager::handlePlayerAttack(int newX, int newY, Character& hero,
             const bool dropsLarge = dynamic_cast<Troll*>(it->get()) != nullptr;
             
             (*it)->onDeath(hero);
+            if (Hobbit* h = dynamic_cast<Hobbit*>(it->get())) {
+                if (h->hasLandedLuckyHit()) {
+                    hero.gainXp(25); // bonus XP for surviving and killing a lucky Hobbit
+                }
+            }
             enemies.erase(it);
             
             if      (dropsSmall) ++smallPotions;
