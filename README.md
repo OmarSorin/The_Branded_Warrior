@@ -8,10 +8,10 @@ W- move upwards
 A- move to the left  
 S- move downwards  
 D- move to the left  
-ESC- exit game
-U- heal 25hp small potion
-I- heal 50hp medium potion
-O- heal 100hp big potion
+ESC- exit game  
+U- heal 25hp small potion  
+I- heal 50hp medium potion  
+O- heal 100hp big potion  
 
 Background sprites from - https://craftpix.net/freebies/free-top-down-roguelike-game-kit-pixel-art/ + some drawn by me using piskelapp.com
 Character sprites - will be replaced in future versions but gotten from random reddit post https://www.reddit.com/r/Berserk/comments/vflhty/necesito_sprites_de_guts_caminando_hacia/
