@@ -17,7 +17,7 @@ private:
     int posX;
     int posY;
 
-    static int totalEnemiesCreated;
+    static int totalEnemiesCreated; // cppcheck-suppress unusedFunction
 
 protected:
     int  detectionRange = 6; // how many tiles away enemy can detect the hero
@@ -62,8 +62,8 @@ public:
 
     // Returns true if the enemy died
     bool takeDamage(int amount);
-
-    // static int getTotalEnemiesCreated() { return totalEnemiesCreated; } // da l incolo ca nu pot sa l fac sa functioneze
+    // cppcheck-suppress unusedFunction
+    static int getTotalEnemiesCreated() { return totalEnemiesCreated; } // da l incolo ca nu pot sa l fac sa functioneze
 
     friend std::ostream& operator<<(std::ostream& os, const Enemy& e);
 };
