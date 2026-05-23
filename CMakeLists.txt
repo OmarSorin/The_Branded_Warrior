@@ -64,7 +64,6 @@ add_executable(${MAIN_EXECUTABLE_NAME}
 )
 target_sources(${MAIN_EXECUTABLE_NAME}
     PRIVATE
-        src/Example.cpp
         src/Weapon.cpp
         src/Potion.cpp
         src/Inventory.cpp
