@@ -70,3 +70,7 @@ void Troll::updateAI(Character& hero, const Map& dungeon) {
     auto path = findPath(dungeon, getX(), getY(), hero.getX(), hero.getY());
     if (path.size() > 1) setPosition(path[1].first, path[1].second);
 }
+
+void Troll::applyDrops(EnemyManager& manager) {
+    manager.modifyPotions("large", 1);
+}

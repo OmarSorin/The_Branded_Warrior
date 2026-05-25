@@ -2,6 +2,9 @@
 #define GOBLIN_H
 
 #include "Enemy.h"
+#include "EnemyManager.h"
+
+class EnemyManager; //forward declaration
 
 // Goblin: weak but consistent — low HP, reliable damage output
 class Goblin : public Enemy {
@@ -21,6 +24,9 @@ public:
 
     // Chases player on sight within 6 tiles; flat attack when adjacent
     void updateAI(Character& hero, const Map& dungeon) override;
+
+    //apply drops
+    void applyDrops(EnemyManager& manager) override;
 };
 
 #endif // GOBLIN_H

@@ -8,6 +8,9 @@
 
 EnemyManager::EnemyManager(int tileSize) : tileSize(tileSize) {
     enemyShape.setSize(sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize)));
+    registry["small"]  = 0;
+    registry["medium"] = 0;
+    registry["large"]  = 0;
 }
 
 void EnemyManager::spawnInitialEnemies(const Map& dungeon, int spawnX, int spawnY) {
@@ -32,8 +35,9 @@ void EnemyManager::spawnInitialEnemies(const Map& dungeon, int spawnX, int spawn
     std::cerr << "Total enemies created: " << Enemy::getTotalEnemiesCreated() << "\n";
 }
 
-bool EnemyManager::handlePlayerAttack(int newX, int newY, Character& hero, 
-                                      int& smallPotions, int& medPotions, int& largePotions,
+// changed handlePlayerAttack
+// old constructor had int& smallPotions, int& medPotions, int& largePotions,
+bool EnemyManager::handlePlayerAttack(int newX, int newY, Character& hero,
                                       bool& enemyDied) {
     enemyDied = false;
     auto it = std::find_if(enemies.begin(), enemies.end(),
@@ -46,23 +50,24 @@ bool EnemyManager::handlePlayerAttack(int newX, int newY, Character& hero,
         bool died = (*it)->takeDamage(dmg);
         if (died) {
             enemyDied = true;
-            // Detect type BEFORE erasing (for potion drop)
-            const bool dropsSmall = dynamic_cast<Goblin*>(it->get()) != nullptr;
-            const bool dropsMed   = dynamic_cast<Orc*>  (it->get()) != nullptr;
-            const bool dropsLarge = dynamic_cast<Troll*>(it->get()) != nullptr;
-            
+            (*it)->applyDrops(*this);
             (*it)->onDeath(hero);
-            if (Hobbit* h = dynamic_cast<Hobbit*>(it->get())) {
-                if (h->hasLandedLuckyHit()) {
-                    hero.gainXp(25); // bonus XP for surviving and killing a lucky Hobbit
-                }
-            }
             enemies.erase(it);
-            
-            if      (dropsSmall) ++smallPotions;
-            else if (dropsMed)   ++medPotions;
-            else if (dropsLarge) ++largePotions;
-            else                   ++medPotions;
+            // Detect type BEFORE erasing (for potion drop) old version ( i hope at least)
+            // const bool dropsSmall = dynamic_cast<Goblin*>(it->get()) != nullptr;
+            // const bool dropsMed   = dynamic_cast<Orc*>  (it->get()) != nullptr;
+            // const bool dropsLarge = dynamic_cast<Troll*>(it->get()) != nullptr;
+            //(*it)->onDeath(hero); part of old logic
+            // if (Hobbit* h = dynamic_cast<Hobbit*>(it->get())) {
+            //     if (h->hasLandedLuckyHit()) {
+            //         hero.gainXp(25); // bonus XP for surviving and killing a lucky Hobbit
+            //     }
+            // } old hobbit logic
+            //enemies.erase(it); part of old logic
+            // if      (dropsSmall) ++smallPotions;
+            // else if (dropsMed)   ++medPotions;
+            // else if (dropsLarge) ++largePotions;
+            // else                   ++medPotions;  ( old option i hope at least)
         }
         return true; // Attack occurred
     }
@@ -107,6 +112,19 @@ void EnemyManager::draw(sf::RenderWindow& window) {
                                  static_cast<float>(e->getY() * tileSize)});
         window.draw(enemyShape);
     }
+}
+
+void EnemyManager::modifyPotions(const std::string& type, int amount) {
+    auto it = registry.find(type);
+    if (it != registry.end())
+        std::any_cast<int&>(it->second) += amount;
+}
+
+int EnemyManager::getPotions(const std::string& type) const {
+    auto it = registry.find(type);
+    if (it != registry.end())
+        return std::any_cast<int>(it->second);
+    return 0;
 }
 
 EnemyManager::EnemyManager(const EnemyManager& other)

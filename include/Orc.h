@@ -2,6 +2,10 @@
 #define ORC_H
 
 #include "Enemy.h"
+#include "EnemyManager.h"
+
+class EnemyManager; //forward declaration
+
 
 // Orc: berserk fighter — damage doubles when HP falls below 30%
 class Orc : public Enemy {
@@ -22,6 +26,9 @@ public:
     // Normal: BFS chase on sight (5 tile range)
     // Enraged (<30% HP): greedy charge, detection range doubles to 9 tiles
     void updateAI(Character& hero, const Map& dungeon) override;
+
+    //apply drops
+    void applyDrops(EnemyManager& manager) override;
 };
 
 #endif // ORC_H

@@ -80,3 +80,7 @@ void Orc::updateAI(Character& hero, const Map& dungeon) {
         if (path.size() > 1) setPosition(path[1].first, path[1].second);
     }
 }
+
+void Orc::applyDrops(EnemyManager& manager) {
+    manager.modifyPotions("medium", 1);
+}

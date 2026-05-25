@@ -54,3 +54,7 @@ void Goblin::updateAI(Character& hero, const Map& dungeon) {
     }
 }
 
+void Goblin::applyDrops(EnemyManager& manager) {
+    manager.modifyPotions("small", 1);
+}
+

@@ -49,3 +49,7 @@ void Hobbit::updateAI(Character& hero, const Map& dungeon) {
     else if (dungeon.isWalkable(getX(), stepY))
         setPosition(getX(), stepY);
 }
+
+void Hobbit::applyDrops(EnemyManager& manager) {
+    manager.modifyPotions("medium", 1);
+}

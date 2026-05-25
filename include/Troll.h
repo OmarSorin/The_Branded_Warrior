@@ -2,6 +2,10 @@
 #define TROLL_H
 
 #include "Enemy.h"
+#include "EnemyManager.h"
+
+class EnemyManager; //forward declaration
+
 
 // Troll: tanky brute — high HP, heavy hits, regenerates health each turn
 class Troll : public Enemy {
@@ -28,6 +32,9 @@ public:
 
     // Slow (moves every 2 turns), detects hero without LOS (8 tile range), regenerates on its turn
     void updateAI(Character& hero, const Map& dungeon) override;
+
+    //apply drops
+    void applyDrops(EnemyManager& manager) override;
 };
 
 #endif // TROLL_H

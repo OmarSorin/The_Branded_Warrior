@@ -2,6 +2,10 @@
 #define HOBBIT_H
 
 #include "Enemy.h"
+#include "EnemyManager.h"
+
+class EnemyManager; //forward declaration
+
 
 class Hobbit : public Enemy {
 private:
@@ -19,6 +23,9 @@ public:
 
     static int getTotalLuckyHits() { return totalLuckyHits; }
     bool hasLandedLuckyHit() const { return totalLuckyHits > 0; }
+
+    //apply drops
+    void applyDrops(EnemyManager& manager) override;
 };
 
 #endif // HOBBIT_H

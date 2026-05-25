@@ -34,9 +34,9 @@ private:
     sf::Sprite playerSprite;
 
     // Potion Inventory
-    int smallPotions = 0;
-    int medPotions = 0;
-    int largePotions = 0;
+    // int smallPotions = 0;
+    // int medPotions = 0;
+    // int largePotions = 0;
     Potion potSmall;
     Potion potMed;
     Potion potLarge;

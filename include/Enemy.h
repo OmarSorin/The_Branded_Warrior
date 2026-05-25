@@ -6,7 +6,8 @@
 #include <string>
 
 class Character; // forward declaration
-class Map;        // forward declaration
+class Map;
+class EnemyManager;
 
 class Enemy {
 private:
@@ -64,6 +65,8 @@ public:
     bool takeDamage(int amount);
     // cppcheck-suppress unusedFunction
     static int getTotalEnemiesCreated() { return totalEnemiesCreated; } // da l incolo ca nu pot sa l fac sa functioneze
+
+    virtual void applyDrops(EnemyManager& manager) = 0;
 
     friend std::ostream& operator<<(std::ostream& os, const Enemy& e);
 };
