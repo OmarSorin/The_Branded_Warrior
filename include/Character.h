@@ -63,7 +63,7 @@ public:
   // Primeste damage, returneaza true daca personajul a murit
   bool takeDamage(int amount);
 
-  // Foloseste o potiune, returneaza cate HP s-au vindecat (0 daca nu s-a vindecat)
+  // Foloseste o potiune, returneaza cat HP s-au vindecat (0 daca nu s-a vindecat)
   int heal(const Potion &potion);
 
   // Castiga XP si verifica level up, returneaza nr. de niveluri castigate
