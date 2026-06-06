@@ -29,6 +29,8 @@ public:
 
     //apply drops
     void applyDrops(EnemyManager& manager) override;
+
+    const sf::Texture* getTexture() const override;
 };
 
 #endif // ORC_H

@@ -84,3 +84,12 @@ void Orc::updateAI(Character& hero, const Map& dungeon) {
 void Orc::applyDrops(EnemyManager& manager) {
     manager.modifyPotions("medium", 1);
 }
+
+const sf::Texture* Orc::getTexture() const {
+    static sf::Texture tex = []() {
+        sf::Texture t;
+        (void)t.loadFromFile("assets/orc.png");
+        return t;
+    }();
+    return &tex;
+}

@@ -79,7 +79,11 @@ void EnemyManager::takeTurns(Character& hero, const Map& dungeon) {
         // Snapshot position before AI runs
         int prevX = e->getX(), prevY = e->getY();
         e->updateAI(hero, dungeon);
-        
+
+        if ( Troll* t= dynamic_cast<Troll*>(e.get())) {
+            t->regenerate();
+        }
+
         // Enemy collision: revert if it moved onto another enemy's tile
         bool collided = false;
         for (const auto& other : enemies) {
@@ -101,16 +105,23 @@ void EnemyManager::takeTurns(Character& hero, const Map& dungeon) {
 void EnemyManager::draw(sf::RenderWindow& window) {
     for (const auto& e : enemies) {
         if (!e->isAlive()) continue;
-        sf::Color col;
-        if      (dynamic_cast<Troll*>(e.get())) col = sf::Color(140,  80, 200);
-        else if (dynamic_cast<Orc*>  (e.get())) col = sf::Color(200,  60,  40);
-        else if (dynamic_cast<Goblin*>(e.get())) col = sf::Color( 40, 180,  40);
-        else                                     col = sf::Color(220,  220,  180);
-        
-        enemyShape.setFillColor(col);
-        enemyShape.setPosition({static_cast<float>(e->getX() * tileSize),
-                                 static_cast<float>(e->getY() * tileSize)});
-        window.draw(enemyShape);
+
+        const sf::Texture* tex = e->getTexture();
+        if (tex && tex->getSize().x > 0) {
+            sf::Sprite sprite(*tex);
+            float scaleX = static_cast<float>(tileSize) / tex->getSize().x;
+            float scaleY = static_cast<float>(tileSize) / tex->getSize().y;
+            sprite.setScale({scaleX, scaleY});
+            sprite.setPosition({static_cast<float>(e->getX() * tileSize),
+                                static_cast<float>(e->getY() * tileSize)});
+            window.draw(sprite);
+        } else {
+            enemyShape.setTexture(nullptr);
+            enemyShape.setFillColor(sf::Color(200, 60, 40));
+            enemyShape.setPosition({static_cast<float>(e->getX() * tileSize),
+                                    static_cast<float>(e->getY() * tileSize)});
+            window.draw(enemyShape);
+        }
     }
 }
 

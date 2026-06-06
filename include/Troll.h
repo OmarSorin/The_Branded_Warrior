@@ -35,6 +35,8 @@ public:
 
     //apply drops
     void applyDrops(EnemyManager& manager) override;
+    //replaced colors with textures+ refactored gameEngine Draw function, only adding note here
+    const sf::Texture* getTexture() const override;
 };
 
 #endif // TROLL_H

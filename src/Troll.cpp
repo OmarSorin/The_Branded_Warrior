@@ -26,7 +26,8 @@ void Troll::onDeath(Character& killer) {
     killer.gainXp(100);
 }
 
-void Troll::regenerate() {
+void Troll::
+regenerate() {
     if (!isAlive()) return;
     healHp(REGEN_AMOUNT);
 }
@@ -48,8 +49,7 @@ void Troll::updateAI(Character& hero, const Map& dungeon) {
     if (turnCounter < TURN_COOLDOWN) return;
     turnCounter = 0;
 
-    // Regenerate HP each time it takes a turn
-    regenerate();
+    //removed regenerate from this, will be used in enemymanager with dynamic cast because it is a Troll specific function
 
     int dist = std::abs(hero.getX() - getX()) + std::abs(hero.getY() - getY());
 
@@ -73,4 +73,13 @@ void Troll::updateAI(Character& hero, const Map& dungeon) {
 
 void Troll::applyDrops(EnemyManager& manager) {
     manager.modifyPotions("large", 1);
+}
+
+const sf::Texture* Troll::getTexture() const {
+    static sf::Texture tex = []() {
+        sf::Texture t;
+        (void)t.loadFromFile("assets/troll.png");
+        return t;
+    }();
+    return &tex;
 }

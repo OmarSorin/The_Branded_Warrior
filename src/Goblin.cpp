@@ -58,3 +58,12 @@ void Goblin::applyDrops(EnemyManager& manager) {
     manager.modifyPotions("small", 1);
 }
 
+const sf::Texture* Goblin::getTexture() const {
+    static sf::Texture tex = []() {
+        sf::Texture t;
+        (void)t.loadFromFile("assets/goblin.png");
+        return t;
+    }();
+    return &tex;
+}
+

@@ -53,3 +53,12 @@ void Hobbit::updateAI(Character& hero, const Map& dungeon) {
 void Hobbit::applyDrops(EnemyManager& manager) {
     manager.modifyPotions("medium", 1);
 }
+
+const sf::Texture* Hobbit::getTexture() const {
+    static sf::Texture tex = []() {
+        sf::Texture t;
+        (void)t.loadFromFile("assets/Hobbit.png");
+        return t;
+    }();
+    return &tex;
+}
