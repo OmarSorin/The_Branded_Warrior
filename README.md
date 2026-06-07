@@ -12,9 +12,11 @@ ESC- exit game
 U- heal 25hp small potion  
 I- heal 50hp medium potion  
 O- heal 100hp big potion  
+"Win the game" --> To be implemented in next version, stay tuned
 
 Background sprites from - https://craftpix.net/freebies/free-top-down-roguelike-game-kit-pixel-art/ + some drawn by me using piskelapp.com
-Character sprites - will be replaced in future versions but gotten from random reddit post https://www.reddit.com/r/Berserk/comments/vflhty/necesito_sprites_de_guts_caminando_hacia/
+Character sprites - will be replaced in future versions but gotten from random reddit post https://www.reddit.com/r/Berserk/comments/vflhty/necesito_sprites_de_guts_caminando_hacia/  
+Enemy sprites - taken from https://aamatniekss.itch.io/bitcrawl-free-pixelart-assets?download
 
 Random map generation.
 
