@@ -50,6 +50,8 @@ public:
   sf::Color getTileColor(int x, int y) const;
 
   friend std::ostream &operator<<(std::ostream &os, const Map &map);
+
+  void placeExit(int avoidX, int avoidY); // places exit somewhere far
 };
 
 std::ostream &operator<<(std::ostream &os, const Map &map);

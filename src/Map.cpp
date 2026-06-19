@@ -182,7 +182,7 @@ bool Map::isWalkable(int x, int y) const {
   if (!isInBounds(x, y))
     return false;
   TileType t = tiles[y][x];
-  return t == TileType::FLOOR || t == TileType::DOOR;
+  return t == TileType::FLOOR || t == TileType::DOOR || t == TileType::EXIT;
 }
 
 std::pair<int, int> Map::getRandomFloorTile() const {
@@ -204,6 +204,42 @@ std::pair<int, int> Map::getRandomFloorTile() const {
   std::uniform_int_distribution<int> dist(
       0, static_cast<int>(floorTiles.size()) - 1);
   return floorTiles[dist(rng)];
+}
+
+void Map::placeExit(int avoidX, int avoidY) {
+  static std::mt19937 rng{std::random_device{}()};
+
+  std::vector<std::pair<int, int>> floorTiles;
+  int maxDist = 0;
+  for (int row = 0; row < height; ++row) {
+    for (int col = 0; col < width; ++col) {
+      if (tiles[row][col] != TileType::FLOOR)
+        continue;
+      if (col == avoidX && row == avoidY)
+        continue;
+      floorTiles.emplace_back(col, row);
+      int d = std::abs(col - avoidX) + std::abs(row - avoidY);
+      if (d > maxDist)
+        maxDist = d;
+    }
+  }
+
+  if (floorTiles.empty())
+    return; // degenerate map; leave it without an exit
+
+  // Restrict to the far cluster (>= 80% of the farthest distance) so the exit is far from spawn and is actually a challange
+  std::vector<std::pair<int, int>> farTiles;
+  const int threshold = maxDist * 4 / 5;
+  for (const auto &[col, row] : floorTiles) {
+    int d = std::abs(col - avoidX) + std::abs(row - avoidY);
+    if (d >= threshold)
+      farTiles.emplace_back(col, row);
+  }
+
+  const auto &pool = farTiles.empty() ? floorTiles : farTiles;
+  std::uniform_int_distribution<int> pick(0, static_cast<int>(pool.size()) - 1);
+  const auto [ex, ey] = pool[pick(rng)];
+  tiles[ey][ex] = TileType::EXIT;
 }
 
 int Map::countAdjacentWalkable(int x, int y) const {
@@ -255,6 +291,7 @@ sf::Color Map::getTileColor(int x, int y) const {
   case TileType::FLOOR:    return sf::Color(120, 110, 100);
   case TileType::DOOR:     return sf::Color(160, 120, 60);
   case TileType::OBSTACLE: return sf::Color(80, 80, 90);
+  case TileType::EXIT:     return sf::Color(90, 200, 120);
   default:                 return sf::Color::Black;
   }
 }

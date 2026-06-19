@@ -1,9 +1,9 @@
 #include "EnemyManager.h"
+#include "EnemyFactory.h"
 #include "Goblin.h"
 #include "Orc.h"
 #include "Troll.h"
 #include "Hobbit.h"
-#include "EnemyFactory.h"
 #include <algorithm>
 #include <iostream>
 
@@ -15,6 +15,8 @@ EnemyManager::EnemyManager(int tileSize) : tileSize(tileSize) {
 }
 
 void EnemyManager::spawnInitialEnemies(const Map& dungeon, int spawnX, int spawnY) {
+    enemies.clear(); // ensure a clean slate when (re)loading a level
+
     auto spawnEnemy = [&](std::unique_ptr<Enemy> e) {
         auto [ex, ey] = dungeon.getRandomFloorTile();
         while (ex == spawnX && ey == spawnY) {
@@ -38,6 +40,7 @@ void EnemyManager::spawnInitialEnemies(const Map& dungeon, int spawnX, int spawn
     for (const auto& [type, name] : roster) {
         spawnEnemy(EnemyFactory::create(type, name));
     }
+
     std::cerr << "Total enemies created: " << Enemy::getTotalEnemiesCreated() << "\n";
 }
 
@@ -59,6 +62,7 @@ bool EnemyManager::handlePlayerAttack(int newX, int newY, Character& hero,
             (*it)->applyDrops(*this);
             (*it)->onDeath(hero);
             enemies.erase(it);
+            // here lay an old piece of logic RIP :c
         }
         return true; // Attack occurred
     }
@@ -86,7 +90,7 @@ void EnemyManager::takeTurns(Character& hero, const Map& dungeon) {
         }
         if (collided) e->setPosition(prevX, prevY);
     }
-    
+
     enemies.erase(
         std::remove_if(enemies.begin(), enemies.end(),
             [](const std::unique_ptr<Enemy>& e) { return !e->isAlive(); }),
@@ -129,6 +133,11 @@ int EnemyManager::getPotions(const std::string& type) const {
     return 0;
 }
 
+bool EnemyManager::allDefeated() const {
+    return std::none_of(enemies.begin(), enemies.end(),
+        [](const std::unique_ptr<Enemy>& e) { return e->isAlive(); });
+}
+
 EnemyManager::EnemyManager(const EnemyManager& other)
     : enemyShape(other.enemyShape), tileSize(other.tileSize) {
     for (const auto& e : other.enemies)
@@ -141,4 +150,3 @@ EnemyManager& EnemyManager::operator=(EnemyManager other) {
     std::swap(enemyShape, other.enemyShape);
     return *this;
 }
-

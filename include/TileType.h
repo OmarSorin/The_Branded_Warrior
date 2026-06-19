@@ -3,7 +3,7 @@
 
 #include <ostream>
 
-enum class TileType { WALL, FLOOR, DOOR, OBSTACLE };
+enum class TileType { WALL, FLOOR, DOOR, OBSTACLE, EXIT };
 
 std::ostream &operator<<(std::ostream &os, const TileType &tile);
 

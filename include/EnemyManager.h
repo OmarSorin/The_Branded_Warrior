@@ -33,6 +33,8 @@ public:
 
     void modifyPotions(const std::string& type, int amount);
     int getPotions(const std::string& type) const;
+    bool allDefeated() const;
+
 
     void draw(sf::RenderWindow& window);
 

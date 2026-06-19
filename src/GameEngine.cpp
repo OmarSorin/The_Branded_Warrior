@@ -1,6 +1,6 @@
 #include "GameEngine.h"
-#include "Weapon.h"
 #include "MathUtils.h"
+#include "Weapon.h"
 
 GameEngine::GameEngine()
     : window(sf::VideoMode({1280u, 720u}), "The Branded Warrior"),
@@ -28,13 +28,6 @@ GameEngine::GameEngine()
 }
 
 void GameEngine::initialize() {
-    dungeon.generate(8, 12);
-
-    auto [spawnX, spawnY] = dungeon.getRandomFloorTile();
-    hero.setPosition(spawnX, spawnY);
-
-    enemyManager.spawnInitialEnemies(dungeon, spawnX, spawnY);
-
     (void)hudFont.openFromFile("C:/Windows/Fonts/arial.ttf");
     hudRenderer = HudRenderer(hudFont);
 
@@ -48,6 +41,21 @@ void GameEngine::initialize() {
     float scaleX = static_cast<float>(TILE_SIZE) / static_cast<float>(texSize.x);
     float scaleY = static_cast<float>(TILE_SIZE) / static_cast<float>(texSize.y);
     playerSprite.setScale({scaleX, scaleY});
+
+    loadLevel(0);
+}
+
+void GameEngine::loadLevel(int index) {
+    currentLevel = index;
+
+    dungeon.generate(8, 12);
+
+    auto [spawnX, spawnY] = dungeon.getRandomFloorTile();
+    hero.setPosition(spawnX, spawnY);
+
+    dungeon.placeExit(spawnX, spawnY);
+
+    enemyManager.spawnInitialEnemies(dungeon, spawnX, spawnY);
 
     updateCamera();
 }
@@ -84,9 +92,28 @@ void GameEngine::handleInput() {
                     bool enemyDied = false;
                     bool enemyPresent = enemyManager.handlePlayerAttack(newX, newY, hero, enemyDied);
 
-                    if ((enemyPresent && enemyDied) || (!enemyPresent && dungeon.isWalkable(newX, newY))) {
+                    // The exit stays sealed until every enemy on the floor is
+                    // defeated — the hero cannot step onto it before then.
+                    const bool targetIsExit =
+                        dungeon.getTile(newX, newY) == TileType::EXIT;
+                    const bool exitSealed =
+                        targetIsExit && !enemyManager.allDefeated();
+
+                    if (exitSealed) {
+                        exitHintActive = true;
+                        exitHintClock.restart();
+                    }
+
+                    if (!exitSealed
+                        && ((enemyPresent && enemyDied)
+                            || (!enemyPresent && dungeon.isWalkable(newX, newY)))) {
                         hero.setPosition(newX, newY);
                         updateCamera();
+
+                        if (targetIsExit) { // floor cleared → descend
+                            loadLevel(currentLevel + 1);
+                            continue; // fresh level loaded; skip enemy turn
+                        }
                     }
 
                     enemyManager.takeTurns(hero, dungeon);
@@ -139,11 +166,15 @@ void GameEngine::render() {
     enemyManager.draw(window);
     window.draw(playerSprite);
 
+    const bool showExitHint = exitHintActive
+        && exitHintClock.getElapsedTime().asSeconds() < EXIT_HINT_SECONDS;
+
     hudRenderer.draw(window, hero,
                      enemyManager.getPotions("small"),
                      enemyManager.getPotions("medium"),
                      enemyManager.getPotions("large"),
-                     gameOver);
+                     gameOver,
+                     showExitHint);
 
     window.setView(camera);
     window.display();

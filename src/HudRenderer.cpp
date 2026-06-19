@@ -8,8 +8,9 @@ HudRenderer::HudRenderer(const sf::Font& font)
       potLabelMed(font),
       potLabelLarge(font),
       deathTitle(font),
-      deathSub(font) {
-    // ── HP bar setup ────────────────────────────────────────────────────────
+      deathSub(font),
+      exitHint(font) {
+    //HP bar setup
     hpBg.setSize({HP_BAR_MAX_W + HUD_PAD * 2, BAR_H + HUD_PAD * 2});
     hpBg.setFillColor(sf::Color(0, 0, 0, 180));
     hpBg.setOutlineColor(sf::Color(160, 30, 30));
@@ -23,7 +24,7 @@ HudRenderer::HudRenderer(const sf::Font& font)
     hpText.setCharacterSize(20);
     hpText.setFillColor(sf::Color::White);
 
-    // ── XP bar setup ────────────────────────────────────────────────────────
+    //XP bar setup
     xpBg.setSize({HP_BAR_MAX_W + HUD_PAD * 2, BAR_H + HUD_PAD * 2});
     xpBg.setFillColor(sf::Color(0, 0, 0, 180));
     xpBg.setOutlineColor(sf::Color(30, 80, 160));
@@ -35,7 +36,7 @@ HudRenderer::HudRenderer(const sf::Font& font)
     xpText.setCharacterSize(20);
     xpText.setFillColor(sf::Color::White);
 
-    // ── Potion panel setup ──────────────────────────────────────────────────
+    //Potion panel setup
     potBg.setSize({POT_PANEL_W, POT_ROW_H * 3 + 8.f});
     potBg.setFillColor(sf::Color(0, 0, 0, 160));
     potBg.setOutlineColor(sf::Color(100, 80, 40));
@@ -44,10 +45,10 @@ HudRenderer::HudRenderer(const sf::Font& font)
 
     flaskSmall.setSize({POT_ICON_W, POT_ICON_H});
     flaskSmall.setFillColor(sf::Color(50, 200, 80));
-    
+
     flaskMed.setSize({POT_ICON_W, POT_ICON_H});
     flaskMed.setFillColor(sf::Color(50, 120, 220));
-    
+
     flaskLarge.setSize({POT_ICON_W, POT_ICON_H});
     flaskLarge.setFillColor(sf::Color(180, 60, 220));
 
@@ -60,7 +61,7 @@ HudRenderer::HudRenderer(const sf::Font& font)
     potLabelLarge.setCharacterSize(16);
     potLabelLarge.setFillColor(sf::Color(220, 160, 255));
 
-    // ── YOU DIED overlay setup ──────────────────────────────────────────────
+    //YOU DIED overlay setup
     deathOverlay.setSize({1280.f, 720.f});
     deathOverlay.setFillColor(sf::Color(0, 0, 0, 180));
     deathTitle.setString("YOU DIED");
@@ -78,6 +79,18 @@ HudRenderer::HudRenderer(const sf::Font& font)
     deathSub.setOrigin({dsBounds.position.x + dsBounds.size.x / 2.f,
                         dsBounds.position.y + dsBounds.size.y / 2.f});
     deathSub.setPosition({640.f, 420.f});
+
+    //Exit hint banner setup
+    exitHint.setString("You must defeat all enemies before advancing");
+    exitHint.setCharacterSize(24);
+    exitHint.setFillColor(sf::Color(255, 230, 150));
+    exitHint.setStyle(sf::Text::Bold);
+    exitHint.setOutlineColor(sf::Color(0, 0, 0, 200));
+    exitHint.setOutlineThickness(2.f);
+    auto ehBounds = exitHint.getLocalBounds();
+    exitHint.setOrigin({ehBounds.position.x + ehBounds.size.x / 2.f,
+                        ehBounds.position.y + ehBounds.size.y / 2.f});
+    exitHint.setPosition({640.f, 660.f});
 }
 
 void HudRenderer::draw(sf::RenderWindow& window,
@@ -85,11 +98,12 @@ void HudRenderer::draw(sf::RenderWindow& window,
                        int smallPotions,
                        int medPotions,
                        int largePotions,
-                       bool gameOver) {
+                       bool gameOver,
+                       bool showExitHint) {
     // Reset to screen-space view for HUD rendering
     window.setView(window.getDefaultView());
 
-    // ── Draw HP bar ─────────────────────────────────────────────────────────
+    //Draw HP bar
     float hpRatio = static_cast<float>(hero.getHp()) / static_cast<float>(hero.getMaxHp());
     if (hpRatio < 0.f) hpRatio = 0.f;
     hpBar.setSize({HP_BAR_MAX_W * hpRatio, BAR_H});
@@ -101,7 +115,7 @@ void HudRenderer::draw(sf::RenderWindow& window,
     window.draw(hpBar);
     window.draw(hpText);
 
-    // ── Draw XP bar ─────────────────────────────────────────────────────────
+    //Draw XP bar
     float xpRatio = static_cast<float>(hero.getXp()) / static_cast<float>(hero.getXpForNextLevel());
     if (xpRatio < 0.f) xpRatio = 0.f;
     if (xpRatio > 1.f) xpRatio = 1.f;
@@ -115,7 +129,7 @@ void HudRenderer::draw(sf::RenderWindow& window,
     window.draw(xpBar);
     window.draw(xpText);
 
-    // ── Draw Potion Panel ───────────────────────────────────────────────────
+    //Draw Potion Panel
     window.draw(potBg);
     const float textOffX = POT_ICON_W + 6.f;
 
@@ -137,7 +151,12 @@ void HudRenderer::draw(sf::RenderWindow& window,
     window.draw(flaskLarge);
     window.draw(potLabelLarge);
 
-    // ── Draw YOU DIED overlay ───────────────────────────────────────────────
+    //Draw exit hint banner
+    if (showExitHint) {
+        window.draw(exitHint);
+    }
+
+    //Draw YOU DIED overlay
     if (gameOver) {
         window.draw(deathOverlay);
         window.draw(deathTitle);
