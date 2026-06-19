@@ -1,5 +1,6 @@
 #include "GameEngine.h"
 #include "Weapon.h"
+#include "MathUtils.h"
 
 GameEngine::GameEngine()
     : window(sf::VideoMode({1280u, 720u}), "The Branded Warrior"),
@@ -118,10 +119,8 @@ void GameEngine::updateCamera() {
     float cx = static_cast<float>(hero.getX() * TILE_SIZE) + TILE_SIZE / 2.f;
     float cy = static_cast<float>(hero.getY() * TILE_SIZE) + TILE_SIZE / 2.f;
 
-    if (cx < halfW) cx = halfW;
-    if (cy < halfH) cy = halfH;
-    if (cx > mapW - halfW) cx = mapW - halfW;
-    if (cy > mapH - halfH) cy = mapH - halfH;
+    cx = util::clamp(cx, halfW, mapW - halfW);
+    cy = util::clamp(cy, halfH, mapH - halfH);
 
     camera.setCenter({cx, cy});
 

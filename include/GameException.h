@@ -31,4 +31,10 @@ public:
         : GameException("Invalid inventory index: " + std::to_string(index)) {}
 };
 
+class UnknownEnemyTypeException : public GameException {
+public:
+    explicit UnknownEnemyTypeException(const std::string& type)
+        : GameException("Unknown enemy type: '" + type + "'") {}
+};
+
 #endif // GAMEEXCEPTION_H

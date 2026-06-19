@@ -3,6 +3,7 @@
 #include "Orc.h"
 #include "Troll.h"
 #include "Hobbit.h"
+#include "EnemyFactory.h"
 #include <algorithm>
 #include <iostream>
 
@@ -25,13 +26,18 @@ void EnemyManager::spawnInitialEnemies(const Map& dungeon, int spawnX, int spawn
 
     };
 
-    spawnEnemy(std::make_unique<Goblin>("Goblin"));
-    spawnEnemy(std::make_unique<Goblin>("Goblin 2"));
-    spawnEnemy(std::make_unique<Goblin>("Goblin 3"));
-    spawnEnemy(std::make_unique<Orc>("Orc"));
-    spawnEnemy(std::make_unique<Orc>("Orc 2"));
-    spawnEnemy(std::make_unique<Troll>("Troll"));
-    spawnEnemy(std::make_unique<Hobbit>("Hobbit"));
+    const std::pair<std::string, std::string> roster[] = {
+        {"goblin", "Goblin"},
+        {"goblin", "Goblin 2"},
+        {"goblin", "Goblin 3"},
+        {"orc",    "Orc"},
+        {"orc",    "Orc 2"},
+        {"troll",  "Troll"},
+        {"hobbit", "Hobbit"},
+    };
+    for (const auto& [type, name] : roster) {
+        spawnEnemy(EnemyFactory::create(type, name));
+    }
     std::cerr << "Total enemies created: " << Enemy::getTotalEnemiesCreated() << "\n";
 }
 
@@ -53,21 +59,6 @@ bool EnemyManager::handlePlayerAttack(int newX, int newY, Character& hero,
             (*it)->applyDrops(*this);
             (*it)->onDeath(hero);
             enemies.erase(it);
-            // Detect type BEFORE erasing (for potion drop) old version ( i hope at least)
-            // const bool dropsSmall = dynamic_cast<Goblin*>(it->get()) != nullptr;
-            // const bool dropsMed   = dynamic_cast<Orc*>  (it->get()) != nullptr;
-            // const bool dropsLarge = dynamic_cast<Troll*>(it->get()) != nullptr;
-            //(*it)->onDeath(hero); part of old logic
-            // if (Hobbit* h = dynamic_cast<Hobbit*>(it->get())) {
-            //     if (h->hasLandedLuckyHit()) {
-            //         hero.gainXp(25); // bonus XP for surviving and killing a lucky Hobbit
-            //     }
-            // } old hobbit logic
-            //enemies.erase(it); part of old logic
-            // if      (dropsSmall) ++smallPotions;
-            // else if (dropsMed)   ++medPotions;
-            // else if (dropsLarge) ++largePotions;
-            // else                   ++medPotions;  ( old option i hope at least)
         }
         return true; // Attack occurred
     }

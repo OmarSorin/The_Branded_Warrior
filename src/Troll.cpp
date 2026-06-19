@@ -1,11 +1,10 @@
 #include "Troll.h"
-
+#include "Range.h"
 #include "Character.h"
 #include "Map.h"
 #include "Pathfinding.h"
 #include <cstdlib>
 #include <ostream>
-#include <random>
 
 Troll::Troll(const std::string& name, int posX, int posY)
     : Enemy(name, 100, 3, posX, posY) {
@@ -17,9 +16,8 @@ std::unique_ptr<Enemy> Troll::clone() const {
 }
 
 int Troll::computeAttackDamage() const {
-    static std::mt19937 rng{std::random_device{}()};
-    std::uniform_int_distribution<int> dist(18, 28);
-    return dist(rng); // heavy but unpredictable
+    static constexpr util::Range<int> damageRange(18, 28);
+    return damageRange.getRandom(); // heavy but unpredictable
 }
 
 void Troll::onDeath(Character& killer) {

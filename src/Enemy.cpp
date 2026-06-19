@@ -1,5 +1,5 @@
 #include "Enemy.h"
-
+#include "MathUtils.h"
 #include "Character.h"
 
 int Enemy::totalEnemiesCreated = 0;
@@ -21,8 +21,7 @@ bool Enemy::takeDamage(int amount) {
 }
 
 void Enemy::healHp(int amount) {
-    hp += amount;
-    if (hp > maxHp) hp = maxHp;
+    hp = util::clamp(hp + amount, 0, maxHp);
 }
 
 

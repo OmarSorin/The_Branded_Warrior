@@ -1,6 +1,7 @@
 #include "Hobbit.h"
 #include "Character.h"
 #include "Map.h"
+#include "Range.h"
 #include <cstdlib>
 
 int Hobbit::totalLuckyHits = 0;
@@ -13,8 +14,8 @@ std::unique_ptr<Enemy> Hobbit::clone() const {
 }
 
 int Hobbit::computeAttackDamage() const {
-    // 20% chance for lucky hit
-    if (std::rand() % 100 < 20) {
+    static constexpr util::Range<float> luckRoll(0.0f, 1.0f);
+    if (luckRoll.getRandom() < 0.20f) {
         ++totalLuckyHits;
         return 75;
     }

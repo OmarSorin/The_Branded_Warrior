@@ -61,6 +61,10 @@ add_executable(${MAIN_EXECUTABLE_NAME}
     main.cpp
         include/Hobbit.h
         src/Hobbit.cpp
+        include/Range.h
+        include/MathUtils.h
+        include/EnemyFactory.h
+        src/EnemyFactory.cpp
 )
 target_sources(${MAIN_EXECUTABLE_NAME}
     PRIVATE
