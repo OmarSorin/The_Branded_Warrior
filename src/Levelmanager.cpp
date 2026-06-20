@@ -1,6 +1,6 @@
 #include "Levelmanager.h"
 // cppcheck-suppress unusedFunction
-LevelConfig Levelmanager::configFor(int depth) const {
+LevelConfig Levelmanager::configFor(int depth) {
     // The dungeon gets bigger and more cluttered each level
     LevelConfig cfg(6 + depth * 2,
                     8 + depth * 4);

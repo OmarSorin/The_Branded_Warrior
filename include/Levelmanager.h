@@ -49,7 +49,7 @@ public:
 class Levelmanager {
 public:
     // cppcheck-suppress unusedFunction
-    LevelConfig configFor(int depth) const;
+    static LevelConfig configFor(int depth);
 };
 
 #endif // LEVELMANAGER_H
