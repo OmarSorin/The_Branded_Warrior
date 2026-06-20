@@ -16,8 +16,10 @@ public:
     EnemySpawn(std::string type, util::Range<int> count)
         : type(std::move(type)), count(count) {}
 
+    // cppcheck-suppress unusedFunction
     const std::string &getType() const { return type; }
 
+    // cppcheck-suppress unusedFunction
     const util::Range<int> &getCount() const { return count; }
 };
 
@@ -33,16 +35,20 @@ public:
 
     void addSpawn(const EnemySpawn &spawn) { roster.push_back(spawn); }
 
+    // cppcheck-suppress unusedFunction
     int getNumRooms() const { return numRooms; }
 
+    // cppcheck-suppress unusedFunction
     int getObstacleCount() const { return obstacleCount; }
 
+    // cppcheck-suppress unusedFunction
     const std::vector<EnemySpawn> &getRoster() const { return roster; }
 };
 
 //dungeon grows each lvl
 class Levelmanager {
 public:
+    // cppcheck-suppress unusedFunction
     LevelConfig configFor(int depth) const;
 };
 
