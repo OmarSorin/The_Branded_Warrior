@@ -1,6 +1,7 @@
 #include "GameEngine.h"
 #include "MathUtils.h"
 #include "Weapon.h"
+#include "Levelmanager.h"
 
 GameEngine::GameEngine()
     : window(sf::VideoMode({1280u, 720u}), "The Branded Warrior"),
@@ -48,14 +49,15 @@ void GameEngine::initialize() {
 void GameEngine::loadLevel(int index) {
     currentLevel = index;
 
-    dungeon.generate(8, 12);
+    const LevelConfig config = levelManager.configFor(index);
+    dungeon.generate(config.getNumRooms(), config.getObstacleCount());
 
     auto [spawnX, spawnY] = dungeon.getRandomFloorTile();
     hero.setPosition(spawnX, spawnY);
 
     dungeon.placeExit(spawnX, spawnY);
 
-    enemyManager.spawnInitialEnemies(dungeon, spawnX, spawnY);
+    enemyManager.spawnFromConfig(dungeon, spawnX, spawnY, config);
 
     updateCamera();
 }

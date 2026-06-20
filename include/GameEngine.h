@@ -7,6 +7,7 @@
 #include "MapRenderer.h"
 #include "EnemyManager.h"
 #include "HudRenderer.h"
+#include "Levelmanager.h"
 
 class GameEngine {
 private:
@@ -33,6 +34,7 @@ private:
     MapRenderer mapRenderer;
     EnemyManager enemyManager;
     HudRenderer hudRenderer;
+    Levelmanager levelManager;
 
     // Player Rendering
     sf::Texture texRight, texLeft, texUp, texDown;

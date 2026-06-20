@@ -65,6 +65,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         include/MathUtils.h
         include/EnemyFactory.h
         src/EnemyFactory.cpp
+        include/LevelManager.h
+        src/LevelManager.cpp
 )
 target_sources(${MAIN_EXECUTABLE_NAME}
     PRIVATE

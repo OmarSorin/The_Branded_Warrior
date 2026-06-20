@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include "Character.h"
 #include "Map.h"
-
+class LevelConfig;
 class EnemyManager {
 private:
     std::vector<std::unique_ptr<Enemy>> enemies;
@@ -20,7 +20,8 @@ private:
 public:
     explicit EnemyManager(int tileSize);
 
-    void spawnInitialEnemies(const Map& dungeon, int spawnX, int spawnY);
+    void spawnFromConfig(const Map& dungeon, int spawnX, int spawnY,
+                     const LevelConfig& config);
 
     // Processes player attack on enemy at (newX, newY). Returns true if an enemy is present.
     // enemyDied is set to true if the attack killed the enemy.

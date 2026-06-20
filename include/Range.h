@@ -9,7 +9,7 @@ namespace util {
     template <typename T>
     class Range {
         static_assert(std::is_arithmetic_v<T>,
-                      "Range<T> requires an arithmetic type");
+                      "Range requires an arithmetic type");
 
         T minVal;
         T maxVal;

@@ -1,5 +1,6 @@
 #include "EnemyManager.h"
 #include "EnemyFactory.h"
+#include "Levelmanager.h"
 #include "Goblin.h"
 #include "Orc.h"
 #include "Troll.h"
@@ -14,7 +15,8 @@ EnemyManager::EnemyManager(int tileSize) : tileSize(tileSize) {
     registry["large"]  = 0;
 }
 
-void EnemyManager::spawnInitialEnemies(const Map& dungeon, int spawnX, int spawnY) {
+void EnemyManager::spawnFromConfig(const Map& dungeon, int spawnX, int spawnY,
+                                    const LevelConfig& config) {
     enemies.clear(); // ensure a clean slate when (re)loading a level
 
     auto spawnEnemy = [&](std::unique_ptr<Enemy> e) {
@@ -28,20 +30,22 @@ void EnemyManager::spawnInitialEnemies(const Map& dungeon, int spawnX, int spawn
 
     };
 
-    const std::pair<std::string, std::string> roster[] = {
-        {"goblin", "Goblin"},
-        {"goblin", "Goblin 2"},
-        {"goblin", "Goblin 3"},
-        {"orc",    "Orc"},
-        {"orc",    "Orc 2"},
-        {"troll",  "Troll"},
-        {"hobbit", "Hobbit"},
-    };
-    for (const auto& [type, name] : roster) {
-        spawnEnemy(EnemyFactory::create(type, name));
+    int counter = 0;
+    for (const auto& spawn : config.getRoster()) {
+        std::string label = spawn.getType();
+        if (!label.empty())
+            label[0] = static_cast<char>(
+                std::toupper(static_cast<unsigned char>(label[0])));
+
+        const int n = spawn.getCount().getRandom();
+        for (int i = 0; i < n; ++i) {
+            std::string name = label + " " + std::to_string(++counter);
+            spawnEnemy(EnemyFactory::create(spawn.getType(), name));
+        }
     }
 
-    std::cerr << "Total enemies created: " << Enemy::getTotalEnemiesCreated() << "\n";
+    std::cerr << "Level enemies spawned: " << counter
+              << " (total created: " << Enemy::getTotalEnemiesCreated() << ")\n";
 }
 
 // changed handlePlayerAttack
