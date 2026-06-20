@@ -19,16 +19,18 @@ private:
     int posX;
     int posY;
 
+    double statMultiplier=1.0;
+
     static int totalEnemiesCreated; // cppcheck-suppress unusedFunction
 
 protected:
     int  detectionRange = 6; // how many tiles away enemy can detect the hero
     bool aggro          = false; // true once enemy has spotted the hero
 
-    // Available to derived classes for healing (e.g. Troll regen)
+    // available to derived classes for healing
     virtual void healHp(int amount);
 
-    // NVI: derived classes implement this
+    // derived classes implement this
     virtual void doDisplay(std::ostream& os) const = 0;
 
 public:
@@ -61,6 +63,10 @@ public:
     bool isAlive() const { return hp > 0; }
 
     void setPosition(int x, int y);
+
+    void applyDepthScaling(int depth);
+
+    int attackDamage() const;
 
     // Returns true if the enemy died
     bool takeDamage(int amount);

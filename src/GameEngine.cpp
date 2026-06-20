@@ -1,7 +1,6 @@
 #include "GameEngine.h"
 #include "MathUtils.h"
 #include "Weapon.h"
-#include "Levelmanager.h"
 
 GameEngine::GameEngine()
     : window(sf::VideoMode({1280u, 720u}), "The Branded Warrior"),
@@ -80,7 +79,7 @@ void GameEngine::handleInput() {
                 window.close();
             }
 
-            if (!gameOver) {
+            if (!gameOver && !won) {
                 int dx = 0, dy = 0;
                 if      (keyPressed->code == sf::Keyboard::Key::W) { dy = -1; playerSprite.setTexture(texUp, true); }
                 else if (keyPressed->code == sf::Keyboard::Key::S) { dy =  1; playerSprite.setTexture(texDown, true); }
@@ -112,9 +111,13 @@ void GameEngine::handleInput() {
                         hero.setPosition(newX, newY);
                         updateCamera();
 
-                        if (targetIsExit) { // floor cleared → descend
-                            loadLevel(currentLevel + 1);
-                            continue; // fresh level loaded; skip enemy turn
+                        if (targetIsExit) { // floor cleared → descend or win
+                            if (levelManager.isFinalLevel(currentLevel)) {
+                                won = true;
+                            } else {
+                                loadLevel(currentLevel + 1);
+                            }
+                            continue; // new state; skip enemy turn
                         }
                     }
 
@@ -176,7 +179,10 @@ void GameEngine::render() {
                      enemyManager.getPotions("medium"),
                      enemyManager.getPotions("large"),
                      gameOver,
-                     showExitHint);
+                     showExitHint,
+                     won,
+                     currentLevel + 1,
+                     levelManager.levelCount());
 
     window.setView(camera);
     window.display();

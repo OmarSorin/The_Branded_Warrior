@@ -6,6 +6,7 @@
 #include "Troll.h"
 #include "Hobbit.h"
 #include <algorithm>
+#include <cctype>
 #include <iostream>
 
 EnemyManager::EnemyManager(int tileSize) : tileSize(tileSize) {
@@ -16,7 +17,7 @@ EnemyManager::EnemyManager(int tileSize) : tileSize(tileSize) {
 }
 
 void EnemyManager::spawnFromConfig(const Map& dungeon, int spawnX, int spawnY,
-                                    const LevelConfig& config) {
+                                   const LevelConfig& config) {
     enemies.clear(); // ensure a clean slate when (re)loading a level
 
     auto spawnEnemy = [&](std::unique_ptr<Enemy> e) {
@@ -27,10 +28,12 @@ void EnemyManager::spawnFromConfig(const Map& dungeon, int spawnX, int spawnY,
         }
         e->setPosition(ex, ey);
         enemies.push_back(std::move(e));
-
     };
 
+    // Each roster entry rolls its count from a Range, then the Factory turns
+    // the (type, name) pair into the right concrete Enemy.
     int counter = 0;
+    const int depth = config.getDepth();
     for (const auto& spawn : config.getRoster()) {
         std::string label = spawn.getType();
         if (!label.empty())
@@ -40,7 +43,9 @@ void EnemyManager::spawnFromConfig(const Map& dungeon, int spawnX, int spawnY,
         const int n = spawn.getCount().getRandom();
         for (int i = 0; i < n; ++i) {
             std::string name = label + " " + std::to_string(++counter);
-            spawnEnemy(EnemyFactory::create(spawn.getType(), name));
+            auto enemy = EnemyFactory::create(spawn.getType(), name);
+            enemy->applyDepthScaling(depth);
+            spawnEnemy(std::move(enemy));
         }
     }
 
@@ -66,7 +71,6 @@ bool EnemyManager::handlePlayerAttack(int newX, int newY, Character& hero,
             (*it)->applyDrops(*this);
             (*it)->onDeath(hero);
             enemies.erase(it);
-            // here lay an old piece of logic RIP :c
         }
         return true; // Attack occurred
     }

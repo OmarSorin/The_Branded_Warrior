@@ -25,16 +25,19 @@ private:
     Map dungeon;
     Character hero;
     bool gameOver;
-    int currentLevel=0;
+    int currentLevel = 0;
+    bool won = false;
 
+    // Brief "defeat all enemies" banner shown after bumping a sealed exit.
     bool exitHintActive = false;
     sf::Clock exitHintClock;
+
+    Levelmanager levelManager;
 
     // Subsystems
     MapRenderer mapRenderer;
     EnemyManager enemyManager;
     HudRenderer hudRenderer;
-    Levelmanager levelManager;
 
     // Player Rendering
     sf::Texture texRight, texLeft, texUp, texDown;
@@ -48,10 +51,14 @@ private:
     Potion potMed;
     Potion potLarge;
 
+    // Internal Helpers
     void handleInput();
     void updateCamera();
     void render();
-    void loadLevel(int index); // <-- level structure
+
+    // Builds (or rebuilds) the world for the given level index:
+    // regenerates the dungeon, repositions the hero, respawns enemies.
+    void loadLevel(int index);
 
 public:
     GameEngine();

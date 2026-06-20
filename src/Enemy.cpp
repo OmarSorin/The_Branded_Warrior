@@ -1,6 +1,9 @@
 #include "Enemy.h"
-#include "MathUtils.h"
+
 #include "Character.h"
+#include "MathUtils.h"
+
+#include <cmath>
 
 int Enemy::totalEnemiesCreated = 0;
 
@@ -12,6 +15,16 @@ Enemy::Enemy(const std::string& name, int hp, int level, int posX, int posY)
 void Enemy::setPosition(int x, int y) {
     posX = x;
     posY = y;
+}
+
+void Enemy::applyDepthScaling(int depth) {
+    statMultiplier = 1.0 + 0.25 * depth; // +25% per floor below the first
+    maxHp = static_cast<int>(std::lround(maxHp * statMultiplier));
+    hp = maxHp;
+}
+
+int Enemy::attackDamage() const {
+    return static_cast<int>(std::lround(computeAttackDamage() * statMultiplier));
 }
 
 bool Enemy::takeDamage(int amount) {

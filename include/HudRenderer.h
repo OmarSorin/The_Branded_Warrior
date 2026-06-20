@@ -11,7 +11,7 @@
 //   - "YOU DIED" overlay
 class HudRenderer {
 private:
-    //Layout constants
+    // Layout constants
     static constexpr float HP_BAR_MAX_W = 200.f;
     static constexpr float BAR_H        =  20.f;
     static constexpr float HUD_PAD      =   6.f;
@@ -26,11 +26,11 @@ private:
     static constexpr float POT_HUD_X   = 1280.f - POT_PANEL_W - 16.f;
     static constexpr float POT_HUD_Y   = 16.f;
 
-    //HP bar
+    // HP bar
     sf::RectangleShape hpBg, hpBar;
     sf::Text           hpText;
 
-    //XP bar
+    // XP bar
     sf::RectangleShape xpBg, xpBar;
     sf::Text           xpText;
 
@@ -39,25 +39,33 @@ private:
     sf::RectangleShape flaskSmall, flaskMed, flaskLarge;
     sf::Text           potLabelSmall, potLabelMed, potLabelLarge;
 
-    //YOU DIED overlay
+    // YOU DIED overlay
     sf::RectangleShape deathOverlay;
     sf::Text           deathTitle, deathSub;
 
-    // Exit hint banner
+    //Exit hint banner
     sf::Text exitHint;
 
+    //Floor indicator + victory overlay
+    sf::Text floorText;
+    sf::Text victoryTitle, victorySub;
+
 public:
+    // font must outlive the HudRenderer (it stores a reference internally).
     explicit HudRenderer(const sf::Font& font);
 
-    // Switches to default (screen-space) view, draws everything, doesnt
-    // restore the world camera
+    // Switches to default (screen-space) view, draws everything, does NOT
+    // restore the world camera — the caller is responsible for that.
     void draw(sf::RenderWindow& window,
               const Character&  hero,
               int smallPotions,
               int medPotions,
               int largePotions,
               bool gameOver,
-              bool showExitHint);
+              bool showExitHint,
+              bool won,
+              int currentFloor,
+              int totalFloors);
 };
 
 #endif // HUDRENDERER_H
