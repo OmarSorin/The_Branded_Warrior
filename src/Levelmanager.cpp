@@ -1,6 +1,6 @@
 #include "Levelmanager.h"
 
-LevelConfig Levelmanager::configFor(int depth) const {
+LevelConfig Levelmanager::configFor(int depth) {
     LevelConfig cfg(depth,
                     6 + depth * 2,
                     8 + depth * 4);
