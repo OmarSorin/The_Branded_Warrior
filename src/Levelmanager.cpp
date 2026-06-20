@@ -1,5 +1,5 @@
 #include "Levelmanager.h"
-
+// cppcheck-suppress unusedFunction
 LevelConfig Levelmanager::configFor(int depth) {
     LevelConfig cfg(depth,
                     6 + depth * 2,
