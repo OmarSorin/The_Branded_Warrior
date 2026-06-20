@@ -66,7 +66,7 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         include/EnemyFactory.h
         src/EnemyFactory.cpp
         include/Levelmanager.h
-        src/LevelManager.cpp
+        src/Levelmanager.cpp
 )
 target_sources(${MAIN_EXECUTABLE_NAME}
     PRIVATE
