@@ -38,7 +38,7 @@ void Hobbit::updateAI(Character& hero, const Map& dungeon) {
 
     // Attack if adjacent
     if (dist == 1) {
-        hero.takeDamage(computeAttackDamage());
+        hero.takeDamage(attackDamage());
         return;
     }
 
