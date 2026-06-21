@@ -1,5 +1,5 @@
 #include "Character.h"
-#include "MessageLog.h"
+#include "Messagelog.h"
 
 int Character::xpForNextLevel() const { return level * 50; }
 

@@ -8,7 +8,7 @@
 #include "EnemyManager.h"
 #include "HudRenderer.h"
 #include "Levelmanager.h"
-#include "MessageLog.h"
+#include "Messagelog.h"
 
 class GameEngine {
 private:

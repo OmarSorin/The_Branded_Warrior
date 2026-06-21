@@ -1,5 +1,5 @@
 #include "HudRenderer.h"
-#include "MessageLog.h"
+#include "Messagelog.h"
 #include <string>
 
 HudRenderer::HudRenderer(const sf::Font& font)
