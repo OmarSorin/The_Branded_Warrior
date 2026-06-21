@@ -16,8 +16,9 @@ class LogEntry {
 public:
     LogEntry(std::string text, MessageType type)
         : text(std::move(text)), type(type) {}
-
+    // cppcheck-suppress unusedFunction
     const std::string &getText() const { return text; }
+    // cppcheck-suppress unusedFunction
     MessageType getType() const { return type; }
 };
 
@@ -30,6 +31,7 @@ public:
     void add(const std::string &text, MessageType type = MessageType::Info);
 
     //FIFO
+    // cppcheck-suppress unusedFunction
     const std::deque<LogEntry> &getEntries() const { return entries; }
 };
 

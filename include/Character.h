@@ -57,7 +57,7 @@ public:
   int getY() const { return posY; }
   void setPosition(int x, int y);
   void move(int dx, int dy);
-
+  // cppcheck-suppress unusedFunction
   void setMessageLog(MessageLog *l) { log = l; }
 
   // Adauga arma in inventar
