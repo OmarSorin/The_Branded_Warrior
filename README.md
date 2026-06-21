@@ -1,6 +1,7 @@
 # The Branded Warrior
 
-Un joc 2D, rogue-like despre aventura si lupta. Va fi un joc turn-based in care scopul este sa explorezi o harta si sa gasesti calea de iesire. Pe parcurs vei intalni monstrii, care vor putea fi evitati prin traversarea hartii grid-like sau vor putea fi infruntati. Vor exista diferite tipuri de monstrii, desigur, cu statistici si pattern-uri de atac diferite. Player-ul va dispune si de potiuni de heal( ulterior si de alte efecte, hopefully) care vor fi consumate intr-un turn. Doresc sa implementez si diferite clase/arme/armura, dar voi vedea pe parcurs.
+A 2D rogue-like game about adventure and combat. It will be a turn-based game where the goal is to explore a map and find the exit. Along the way, you will encounter monsters that can either be avoided by navigating the grid-like map or fought directly. There will be different types of monsters, of course, with distinct stats and abilities( berserker, regeneration) . The player will also have access to healing potions (and hopefully other effects later on) that will consume a turn when used. I also want to implement different classes, weapons, and armor, but I will figure that out as I go.
+
 
 Functionalities:
 
