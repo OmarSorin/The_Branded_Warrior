@@ -17,7 +17,7 @@ O- heal 100hp big potion
 In order to do damage you must press the corresponding direction key( W, A, S, D) whilst being on the adjacent tile to the enemy.\
 Similarly, if you are on a tile and you make a move towards an obstacle/wall and the enemy is on an adjacent tile to you, you get damaged.\
 You will get hit by the scary monsters after each hit you give, this will be documented in the lower-left corner.\
-Exits are hardcoded green but will get textures when i find a good-looking/fitting texture, also text res needs to be worked on, arial is ok but ugly.\
+Exits are hardcoded green but will get textures when i find a good-looking/fitting texture, also text res needs to be worked on, arial is ok but ugly.
 
 Background sprites from - https://craftpix.net/freebies/free-top-down-roguelike-game-kit-pixel-art/ + some drawn by me using piskelapp.com
 Character sprites - will be replaced in future versions but gotten from random reddit post https://www.reddit.com/r/Berserk/comments/vflhty/necesito_sprites_de_guts_caminando_hacia/  
