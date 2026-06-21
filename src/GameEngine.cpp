@@ -28,6 +28,9 @@ GameEngine::GameEngine()
 }
 
 void GameEngine::initialize() {
+    hero.setMessageLog(&messageLog);
+    enemyManager.setMessageLog(&messageLog);
+
     (void)hudFont.openFromFile("C:/Windows/Fonts/arial.ttf");
     hudRenderer = HudRenderer(hudFont);
 
@@ -93,8 +96,8 @@ void GameEngine::handleInput() {
                     bool enemyDied = false;
                     bool enemyPresent = enemyManager.handlePlayerAttack(newX, newY, hero, enemyDied);
 
-                    // The exit stays sealed until every enemy on the floor is
-                    // defeated — the hero cannot step onto it before then.
+                    // the exit stays sealed until every enemy on the floor is
+                    // defeated the hero cant step onto it before then.
                     const bool targetIsExit =
                         dungeon.getTile(newX, newY) == TileType::EXIT;
                     const bool exitSealed =
@@ -126,7 +129,7 @@ void GameEngine::handleInput() {
                     if (!hero.isAlive()) gameOver = true;
                 }
 
-                // ── Heal keys ──────────────────────────────────────────────────
+                // Heal keys
                 if (keyPressed->code == sf::Keyboard::Key::U && enemyManager.getPotions("small") > 0) {
                     hero.heal(potSmall);
                     enemyManager.modifyPotions("small", -1);
@@ -182,7 +185,8 @@ void GameEngine::render() {
                      showExitHint,
                      won,
                      currentLevel + 1,
-                     levelManager.levelCount());
+                     levelManager.levelCount(),
+                     messageLog);
 
     window.setView(camera);
     window.display();

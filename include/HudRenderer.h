@@ -4,11 +4,14 @@
 #include <SFML/Graphics.hpp>
 #include "Character.h"
 
+class MessageLog;
+
 // Owns and draws all screen-space HUD elements:
 //   - HP bar (upper-left)
 //   - XP bar (below HP bar)
 //   - Potion panel (upper-right)  [U] small  [I] medium  [O] large
 //   - "YOU DIED" overlay
+//   - MESSAGE LOG
 class HudRenderer {
 private:
     // Layout constants
@@ -50,12 +53,15 @@ private:
     sf::Text floorText;
     sf::Text victoryTitle, victorySub;
 
+    //message log
+    sf::Text logLine;
+
 public:
     // font must outlive the HudRenderer (it stores a reference internally).
     explicit HudRenderer(const sf::Font& font);
 
     // Switches to default (screen-space) view, draws everything, does NOT
-    // restore the world camera — the caller is responsible for that.
+    // restore the world camera the caller is responsible for that.
     void draw(sf::RenderWindow& window,
               const Character&  hero,
               int smallPotions,
@@ -65,7 +71,8 @@ public:
               bool showExitHint,
               bool won,
               int currentFloor,
-              int totalFloors);
+              int totalFloors,
+              const MessageLog& log);
 };
 
 #endif // HUDRENDERER_H

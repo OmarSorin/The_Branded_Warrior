@@ -1,6 +1,7 @@
 #include "EnemyManager.h"
 #include "EnemyFactory.h"
 #include "Levelmanager.h"
+#include "Messagelog.h"
 #include "Goblin.h"
 #include "Orc.h"
 #include "Troll.h"
@@ -30,8 +31,8 @@ void EnemyManager::spawnFromConfig(const Map& dungeon, int spawnX, int spawnY,
         enemies.push_back(std::move(e));
     };
 
-    // Each roster entry rolls its count from a Range, then the Factory turns
-    // the (type, name) pair into the right concrete Enemy.
+    // each roster entry rolls its count from a range, then the Factory turns
+    // the (type, name) pair into the right Enemy.
     int counter = 0;
     const int depth = config.getDepth();
     for (const auto& spawn : config.getRoster()) {
@@ -64,12 +65,19 @@ bool EnemyManager::handlePlayerAttack(int newX, int newY, Character& hero,
         });
 
     if (it != enemies.end()) {
+        const std::string targetName = (*it)->getName();
+        const std::string targetType = targetName.substr(0, targetName.find_last_of(' ')); // taking just the name of the mob
+
         int dmg = hero.getEquippedWeapon().attack();
         bool died = (*it)->takeDamage(dmg);
+        if (log)
+            log->add("You hit a " + targetType + " for " + std::to_string(dmg) + " dmg",
+                     MessageType::Dealt);
         if (died) {
             enemyDied = true;
+            if (log) log->add("A  " + targetType + " has been massacred!", MessageType::Dealt);
             (*it)->applyDrops(*this);
-            (*it)->onDeath(hero);
+            (*it)->onDeath(hero); // grants xp to player
             enemies.erase(it);
         }
         return true; // Attack occurred

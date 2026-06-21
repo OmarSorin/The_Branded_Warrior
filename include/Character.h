@@ -7,6 +7,8 @@
 #include <ostream>
 #include <string>
 
+class MessageLog;
+
 class Character {
 private:
   std::string name;
@@ -18,13 +20,15 @@ private:
   int posX;
   int posY;
 
+  MessageLog *log=nullptr;
+
   int xpForNextLevel() const;
 
   // lvl up, daca primeste mult xp odata mai multe lvl de aia return levelsGained
   int checkLevelUp();
 
 public:
-  // Arma primita este adaugata ca slot 0 in inventar (= arma echipata)
+  // Weapon is added as 1st weapon
   explicit Character(const std::string &name = "Hero", int hp = 100, int level = 1,
             const Weapon &weapon = Weapon(), const Inventory &inv = Inventory(),
             int posX = 0, int posY = 0);
@@ -53,6 +57,8 @@ public:
   int getY() const { return posY; }
   void setPosition(int x, int y);
   void move(int dx, int dy);
+
+  void setMessageLog(MessageLog *l) { log = l; }
 
   // Adauga arma in inventar
   void pickUpWeapon(const Weapon &w);

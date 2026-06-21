@@ -10,15 +10,19 @@
 #include "Character.h"
 #include "Map.h"
 class LevelConfig;
+class MessageLog;
 class EnemyManager {
 private:
     std::vector<std::unique_ptr<Enemy>> enemies;
     sf::RectangleShape enemyShape;
     int tileSize;
     std::unordered_map<std::string, std::any> registry;
+    MessageLog* log = nullptr;
 
 public:
     explicit EnemyManager(int tileSize);
+
+    void setMessageLog(MessageLog* l) { log = l; }
 
     void spawnFromConfig(const Map& dungeon, int spawnX, int spawnY,
                      const LevelConfig& config);

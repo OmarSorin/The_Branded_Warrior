@@ -8,6 +8,7 @@
 #include "EnemyManager.h"
 #include "HudRenderer.h"
 #include "Levelmanager.h"
+#include "MessageLog.h"
 
 class GameEngine {
 private:
@@ -28,13 +29,13 @@ private:
     int currentLevel = 0;
     bool won = false;
 
-    // Brief "defeat all enemies" banner shown after bumping a sealed exit.
+    // defeat all enemies banner shown after bumping a sealed exit.
     bool exitHintActive = false;
     sf::Clock exitHintClock;
 
-    Levelmanager levelManager;
-
     // Subsystems
+    MessageLog messageLog;
+    Levelmanager levelManager;
     MapRenderer mapRenderer;
     EnemyManager enemyManager;
     HudRenderer hudRenderer;

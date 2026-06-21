@@ -1,4 +1,5 @@
 #include "Character.h"
+#include "MessageLog.h"
 
 int Character::xpForNextLevel() const { return level * 50; }
 
@@ -65,6 +66,8 @@ bool Character::takeDamage(int amount) {
   if (hp < 0) {
     hp = 0;
   }
+  if (log && amount > 0)
+    log->add("You took " + std::to_string(amount) + " damage", MessageType::Taken);
   return hp == 0;
 }
 
@@ -82,7 +85,12 @@ int Character::heal(const Potion &potion) {
 
 int Character::gainXp(int amount) {
   xp += amount;
-  return checkLevelUp();
+  if (log && amount > 0)
+    log->add("+" + std::to_string(amount) + " XP", MessageType::Xp);
+  int levelsGained = checkLevelUp();
+  if (log && levelsGained > 0)
+    log->add("Level up! Now level " + std::to_string(level), MessageType::Xp);
+  return levelsGained;
 }
 
 std::ostream &operator<<(std::ostream &os, const Character &c) {

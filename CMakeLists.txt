@@ -67,6 +67,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         src/EnemyFactory.cpp
         include/Levelmanager.h
         src/Levelmanager.cpp
+        include/Messagelog.h
+        src/Messagelog.cpp
 )
 target_sources(${MAIN_EXECUTABLE_NAME}
     PRIVATE
