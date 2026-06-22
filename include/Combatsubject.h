@@ -9,6 +9,7 @@ class CombatSubject {
     std::vector<CombatObserver *> observers;
 
 public:
+    // cppcheck-suppress unusedFunction
     void addObserver(CombatObserver *observer) {
         if (observer)
             observers.push_back(observer);

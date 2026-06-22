@@ -35,7 +35,6 @@ private:
 
     // Subsystems
     MessageLog messageLog;
-    Levelmanager levelManager;
     MapRenderer mapRenderer;
     EnemyManager enemyManager;
     HudRenderer hudRenderer;
