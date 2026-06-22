@@ -7,9 +7,11 @@
 #include <ostream>
 #include <string>
 
+#include "Combatsubject.h"
+
 class MessageLog;
 
-class Character {
+class Character : public CombatSubject {
 private:
   std::string name;
   int hp;
@@ -19,8 +21,6 @@ private:
   Inventory inventory;
   int posX;
   int posY;
-
-  MessageLog *log=nullptr;
 
   int xpForNextLevel() const;
 
@@ -57,8 +57,6 @@ public:
   int getY() const { return posY; }
   void setPosition(int x, int y);
   void move(int dx, int dy);
-  // cppcheck-suppress unusedFunction
-  void setMessageLog(MessageLog *l) { log = l; }
 
   // Adauga arma in inventar
   void pickUpWeapon(const Weapon &w);

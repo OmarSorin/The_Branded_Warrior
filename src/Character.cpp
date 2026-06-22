@@ -1,6 +1,4 @@
 #include "Character.h"
-#include "Messagelog.h"
-#include "GameException.h"
 
 int Character::xpForNextLevel() const { return level * 50; }
 
@@ -31,8 +29,6 @@ Character::Character(const std::string &name, int hp, int level,
 }
 
 void Character::setPosition(int x, int y) {
-  if (x < 0 || y < 0)
-    throw InvalidPositionException(x, y);
   posX = x;
   posY = y;
 }
@@ -46,7 +42,7 @@ void Character::pickUpWeapon(const Weapon &w) { inventory.addWeapon(w); }
 
 int Character::attackTarget(Character &target) {
   if (!isAlive()) {
-    throw DeadCharacterException(name);
+    return 0;
   }
 
   int dealt = inventory.getWeapon(inventory.findStrongestIndex()).attack();;
@@ -69,8 +65,8 @@ bool Character::takeDamage(int amount) {
   if (hp < 0) {
     hp = 0;
   }
-  if (log && amount > 0)
-    log->add("You took " + std::to_string(amount) + " damage", MessageType::Taken);
+  if (amount > 0)
+    notify("You took " + std::to_string(amount) + " damage", MessageType::Taken);
   return hp == 0;
 }
 
@@ -88,11 +84,11 @@ int Character::heal(const Potion &potion) {
 
 int Character::gainXp(int amount) {
   xp += amount;
-  if (log && amount > 0)
-    log->add("+" + std::to_string(amount) + " XP", MessageType::Xp);
+  if (amount > 0)
+    notify("+" + std::to_string(amount) + " XP", MessageType::Xp);
   int levelsGained = checkLevelUp();
-  if (log && levelsGained > 0)
-    log->add("Level up! Now level " + std::to_string(level), MessageType::Xp);
+  if (levelsGained > 0)
+    notify("Level up! Now level " + std::to_string(level), MessageType::Xp);
   return levelsGained;
 }
 

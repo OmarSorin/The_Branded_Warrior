@@ -5,8 +5,7 @@
 #include <string>
 #include <utility>
 
-
-enum class MessageType { Dealt, Taken, Xp, Info };
+#include "Combatobserver.h"
 
 // 1 line in log
 class LogEntry {
@@ -22,13 +21,13 @@ public:
     MessageType getType() const { return type; }
 };
 
-class MessageLog {
+class MessageLog : public CombatObserver {
     std::deque<LogEntry> entries;
     static constexpr std::size_t MAX_ENTRIES = 6;
 
 public:
     // appends a msg, drops old
-    void add(const std::string &text, MessageType type = MessageType::Info);
+    void onCombatEvent(const std::string &text, MessageType type) override;
 
     //FIFO
     // cppcheck-suppress unusedFunction

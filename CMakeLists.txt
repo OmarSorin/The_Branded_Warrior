@@ -69,6 +69,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         src/Levelmanager.cpp
         include/Messagelog.h
         src/Messagelog.cpp
+        include/Combatobserver.h
+        include/Combatsubject.h
 )
 target_sources(${MAIN_EXECUTABLE_NAME}
     PRIVATE

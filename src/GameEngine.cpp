@@ -28,8 +28,8 @@ GameEngine::GameEngine()
 }
 
 void GameEngine::initialize() {
-    hero.setMessageLog(&messageLog);
-    enemyManager.setMessageLog(&messageLog);
+    hero.addObserver(&messageLog);
+    enemyManager.addObserver(&messageLog);
 
     (void)hudFont.openFromFile("C:/Windows/Fonts/arial.ttf");
     hudRenderer = HudRenderer(hudFont);
@@ -51,7 +51,7 @@ void GameEngine::initialize() {
 void GameEngine::loadLevel(int index) {
     currentLevel = index;
 
-    const LevelConfig config = levelManager.configFor(index);
+    const LevelConfig config = Levelmanager::configFor(index);
     dungeon.generate(config.getNumRooms(), config.getObstacleCount());
 
     auto [spawnX, spawnY] = dungeon.getRandomFloorTile();
@@ -96,8 +96,8 @@ void GameEngine::handleInput() {
                     bool enemyDied = false;
                     bool enemyPresent = enemyManager.handlePlayerAttack(newX, newY, hero, enemyDied);
 
-                    // the exit stays sealed until every enemy on the floor is
-                    // defeated the hero cant step onto it before then.
+                    // The exit stays sealed until every enemy on the floor is
+                    // defeated the player cant step on it before then.
                     const bool targetIsExit =
                         dungeon.getTile(newX, newY) == TileType::EXIT;
                     const bool exitSealed =
@@ -115,7 +115,7 @@ void GameEngine::handleInput() {
                         updateCamera();
 
                         if (targetIsExit) { // floor cleared → descend or win
-                            if (levelManager.isFinalLevel(currentLevel)) {
+                            if (Levelmanager::isFinalLevel(currentLevel)) {
                                 won = true;
                             } else {
                                 loadLevel(currentLevel + 1);
@@ -185,7 +185,7 @@ void GameEngine::render() {
                      showExitHint,
                      won,
                      currentLevel + 1,
-                     levelManager.levelCount(),
+                     Levelmanager::levelCount(),
                      messageLog);
 
     window.setView(camera);

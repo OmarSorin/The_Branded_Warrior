@@ -1,7 +1,6 @@
 #include "EnemyManager.h"
 #include "EnemyFactory.h"
 #include "Levelmanager.h"
-#include "Messagelog.h"
 #include "Goblin.h"
 #include "Orc.h"
 #include "Troll.h"
@@ -70,12 +69,11 @@ bool EnemyManager::handlePlayerAttack(int newX, int newY, Character& hero,
 
         int dmg = hero.getEquippedWeapon().attack();
         bool died = (*it)->takeDamage(dmg);
-        if (log)
-            log->add("You hit a " + targetType + " for " + std::to_string(dmg) + " dmg",
-                     MessageType::Dealt);
+        notify("You hit a " + targetType + " for " + std::to_string(dmg) + " dmg",
+               MessageType::Dealt);
         if (died) {
             enemyDied = true;
-            if (log) log->add("A  " + targetType + " has been massacred!", MessageType::Dealt);
+            notify("A  " + targetType + " has been massacred!", MessageType::Dealt);
             (*it)->applyDrops(*this);
             (*it)->onDeath(hero); // grants xp to player
             enemies.erase(it);
