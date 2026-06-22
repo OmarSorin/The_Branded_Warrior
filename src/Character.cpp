@@ -1,5 +1,6 @@
 #include "Character.h"
 #include "Messagelog.h"
+#include "GameException.h"
 
 int Character::xpForNextLevel() const { return level * 50; }
 
@@ -30,6 +31,8 @@ Character::Character(const std::string &name, int hp, int level,
 }
 
 void Character::setPosition(int x, int y) {
+  if (x < 0 || y < 0)
+    throw InvalidPositionException(x, y);
   posX = x;
   posY = y;
 }
@@ -43,7 +46,7 @@ void Character::pickUpWeapon(const Weapon &w) { inventory.addWeapon(w); }
 
 int Character::attackTarget(Character &target) {
   if (!isAlive()) {
-    return 0;
+    throw DeadCharacterException(name);
   }
 
   int dealt = inventory.getWeapon(inventory.findStrongestIndex()).attack();;
