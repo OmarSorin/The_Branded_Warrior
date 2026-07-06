@@ -58,7 +58,7 @@ void Hobbit::applyDrops(EnemyManager& manager) {
 const sf::Texture* Hobbit::getTexture() const {
     static sf::Texture tex = []() {
         sf::Texture t;
-        (void)t.loadFromFile("assets/Hobbit.png");
+        (void)t.loadFromFile("assets/hobbit.png");
         return t;
     }();
     return &tex;

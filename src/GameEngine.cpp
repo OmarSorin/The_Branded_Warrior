@@ -31,7 +31,7 @@ void GameEngine::initialize() {
     hero.addObserver(&messageLog);
     enemyManager.addObserver(&messageLog);
 
-    (void)hudFont.openFromFile("C:/Windows/Fonts/arial.ttf");
+    (void)hudFont.openFromFile("assets/fonts/PixelPurl.ttf");
     hudRenderer = HudRenderer(hudFont);
 
     (void)texRight.loadFromFile("assets/guts-right.png");
